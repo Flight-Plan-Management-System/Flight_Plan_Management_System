@@ -7,6 +7,8 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <set>
+#include <mutex>
 
 // Windows-specific headers for networking
 #include <winsock2.h>
@@ -70,6 +72,68 @@ struct Notam {
     char endTime[20];
     AirspaceInfo affectedAirspace;
     char description[256];
+};
+
+// Connection request handling
+struct ConnectionRequest {
+    std::string parseFromData(const std::string& data) {
+        std::istringstream iss(data);
+        std::string line;
+        std::string clientId;
+
+        // Check if it's a connection request
+        if (std::getline(iss, line) && line == "REQUEST_CONNECTION") {
+            // Parse the CLIENT_ID= line
+            while (std::getline(iss, line)) {
+                if (line.find("CLIENT_ID=") == 0) {
+                    clientId = line.substr(10); // Length of "CLIENT_ID="
+                    break;
+                }
+            }
+        }
+        return clientId;
+    }
+
+    static std::string createAcceptResponse() {
+        return "CONNECTION_ACCEPTED\n";
+    }
+
+    static std::string createRejectResponse() {
+        return "CONNECTION_REJECTED\nREASON=Maximum connections reached. Please hover for 30 more minutes.\n";
+    }
+};
+
+// Client connection manager
+class ConnectionManager {
+public:
+    static const size_t MAX_CONNECTIONS = 5;
+    std::set<std::string> activeClients;
+    std::mutex mutex;
+
+public:
+    bool canAcceptConnection() {
+        std::lock_guard<std::mutex> lock(mutex);
+        return activeClients.size() < MAX_CONNECTIONS;
+    }
+
+    bool addClient(const std::string& clientId) {
+        std::lock_guard<std::mutex> lock(mutex);
+        if (activeClients.size() >= MAX_CONNECTIONS) {
+            return false;
+        }
+        activeClients.insert(clientId);
+        return true;
+    }
+
+    void removeClient(const std::string& clientId) {
+        std::lock_guard<std::mutex> lock(mutex);
+        activeClients.erase(clientId);
+    }
+
+    size_t getActiveClientCount() {
+        std::lock_guard<std::mutex> lock(mutex);
+        return activeClients.size();
+    }
 };
 
 // NOTAM database
@@ -173,7 +237,7 @@ private:
     const NotamDatabase& notamDb_;
 
     static bool isAirspaceAffected(const char* spaceId1, const char* spaceId2) {
-        
+
         return (0 == strcmp(spaceId1, spaceId2));
     }
 
@@ -210,6 +274,7 @@ public:
 class FlightDataHandler {
 private:
     NotamProcessor& notamProcessor_;
+    ConnectionManager& connectionManager_;
 
     std::vector<AirspaceInfo> getRouteAirspaces(const char* departure, const char* arrival) const {
         std::vector<AirspaceInfo> airspaces;
@@ -220,8 +285,8 @@ private:
             for (const char* point : routePoints) {
                 AirspaceInfo space;
                 (void)SafeString::copy(space.identifier, sizeof(space.identifier), point);
-                space.center.latitude = 0.0;   
-                space.center.longitude = 0.0;  
+                space.center.latitude = 0.0;
+                space.center.longitude = 0.0;
                 space.radius = 15.0;
                 airspaces.push_back(space);
             }
@@ -294,11 +359,36 @@ private:
     }
 
 public:
-    explicit FlightDataHandler(NotamProcessor& processor) : notamProcessor_(processor) {
+    explicit FlightDataHandler(NotamProcessor& processor, ConnectionManager& connManager)
+        : notamProcessor_(processor), connectionManager_(connManager) {
         // No initialization needed
     }
 
-    std::string processClientData(const std::string& clientData) {
+    std::string processConnectionRequest(const std::string& clientData) {
+        // Parse connection request
+        ConnectionRequest request;
+        std::string clientId = request.parseFromData(clientData);
+
+        if (clientId.empty()) {
+            return "ERROR: Invalid connection request format";
+        }
+
+        // Check if we can accept connection
+        bool accepted = connectionManager_.canAcceptConnection();
+        if (accepted) {
+            connectionManager_.addClient(clientId);
+            std::cout << "Connection accepted for client: " << clientId
+                << " (Active clients: " << connectionManager_.getActiveClientCount() << ")" << std::endl;
+            return ConnectionRequest::createAcceptResponse();
+        }
+        else {
+            std::cout << "Connection rejected for client: " << clientId
+                << " (Maximum connections reached: " << connectionManager_.getActiveClientCount() << ")" << std::endl;
+            return ConnectionRequest::createRejectResponse();
+        }
+    }
+
+    std::string processFlightPlan(const std::string& clientData, const std::string& clientId) {
         if (clientData.empty()) {
             return "ERROR: Invalid flight data";
         }
@@ -334,6 +424,7 @@ class TcpServer {
 private:
     SOCKET serverSocket_;
     FlightDataHandler& dataHandler_;
+    ConnectionManager& connectionManager_;
     bool isRunning_;
     static const uint32_t BUFFER_SIZE = 4096U;
 
@@ -344,13 +435,55 @@ private:
         if (bytesRead > 0) {
             // Null-terminate the received data
             buffer[static_cast<size_t>(bytesRead)] = '\0';
-
-            // Process the client data
             std::string request(buffer.data());
-            std::string response = dataHandler_.processClientData(request);
+            std::string response;
+            std::string clientId;
 
-            // Send the response back to the client
-            send(clientSocket, response.c_str(), static_cast<int>(response.length()), 0);
+            // Check if this is a connection request
+            if (request.find("REQUEST_CONNECTION") == 0) {
+                // Handle connection request
+                response = dataHandler_.processConnectionRequest(request);
+
+                // Extract client ID for logging
+                ConnectionRequest req;
+                clientId = req.parseFromData(request);
+
+                // Send the response back to the client
+                send(clientSocket, response.c_str(), static_cast<int>(response.length()), 0);
+
+                // If connection was accepted, wait for flight plan data
+                if (response.find("CONNECTION_ACCEPTED") == 0) {
+                    memset(buffer.data(), 0, buffer.size());
+                    bytesRead = recv(clientSocket, buffer.data(), buffer.size() - 1, 0);
+
+                    if (bytesRead > 0) {
+                        buffer[static_cast<size_t>(bytesRead)] = '\0';
+                        std::string flightPlanRequest(buffer.data());
+
+                        // Process flight plan
+                        std::string flightPlanResponse = dataHandler_.processFlightPlan(flightPlanRequest, clientId);
+
+                        // Send flight plan response
+                        send(clientSocket, flightPlanResponse.c_str(),
+                            static_cast<int>(flightPlanResponse.length()), 0);
+
+                        // Log the transaction
+                        std::cout << "\n=== Flight Plan Request from " << clientId << " ===\n"
+                            << flightPlanRequest << std::endl;
+                        std::cout << "=== Server Response ===\n" << flightPlanResponse << std::endl;
+                    }
+
+                    // Remove client when done
+                    connectionManager_.removeClient(clientId);
+                    std::cout << "Client disconnected: " << clientId
+                        << " (Active clients: " << connectionManager_.getActiveClientCount() << ")" << std::endl;
+                }
+            }
+            else {
+                // If not a connection request, this is an error
+                response = "ERROR: Connection request required before sending flight data";
+                send(clientSocket, response.c_str(), static_cast<int>(response.length()), 0);
+            }
 
             // Log the transaction
             std::cout << "\n=== Client Request ===\n" << request << std::endl;
@@ -362,9 +495,10 @@ private:
     }
 
 public:
-    explicit TcpServer(FlightDataHandler& handler) :
+    explicit TcpServer(FlightDataHandler& handler, ConnectionManager& connManager) :
         serverSocket_(INVALID_SOCKET),
         dataHandler_(handler),
+        connectionManager_(connManager),
         isRunning_(false) {
         // No initialization needed
     }
@@ -419,6 +553,7 @@ public:
 
         isRunning_ = true;
         std::cout << "NOTAM Server started on port " << port << std::endl;
+        std::cout << "Maximum concurrent connections: " << ConnectionManager::MAX_CONNECTIONS << std::endl;
 
         return ErrorCode::SUCCESS;
     }
@@ -474,7 +609,7 @@ public:
 int32_t main(int argc, char* argv[]) {
     // Default parameters
     std::string notamFile = "notam_database.txt";
-    uint16_t port = 8080;
+    uint16_t port = 8081;
 
     // Parse command line arguments
     for (int i = 1; i < argc; i += 2) {
@@ -490,23 +625,30 @@ int32_t main(int argc, char* argv[]) {
         }
     }
 
+    std::cout << "NOTAM Server\n";
+    std::cout << "============\n\n";
+
     // Initialize NOTAM database
     NotamDatabase notamDb;
     if (!notamDb.loadFromFile(notamFile)) {
         std::cerr << "Failed to load NOTAM database from: " << notamFile << std::endl;
-        return 1;
+        std::cerr << "Creating an empty database...\n";
+    }
+    else {
+        std::cout << "Loaded NOTAM database from: " << notamFile << std::endl;
     }
 
-    std::cout << "Loaded NOTAM database from: " << notamFile << std::endl;
+    // Initialize connection manager
+    ConnectionManager connectionManager;
 
     // Initialize NOTAM processor
     NotamProcessor processor(notamDb);
 
     // Initialize flight data handler
-    FlightDataHandler handler(processor);
+    FlightDataHandler handler(processor, connectionManager);
 
     // Start the TCP server
-    TcpServer server(handler);
+    TcpServer server(handler, connectionManager);
     ErrorCode startResult = server.start(port);
 
     if (startResult != ErrorCode::SUCCESS) {
