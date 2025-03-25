@@ -10,6 +10,10 @@
 #include <set>
 #include <mutex>
 
+#include <nlohmann/json.hpp>
+#define CURL_STATICLIB
+#include "curl/curl.h"
+
 // Windows-specific headers for networking
 #include <winsock2.h>
 #include <ws2tcpip.h>
