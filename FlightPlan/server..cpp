@@ -15,10 +15,18 @@
 #define CURL_STATICLIB
 #include "curl/curl.h"
 
+/*Windows Specific Additional Depenedencies*/
+#pragma comment (lib,"Normaliz.lib")
+#pragma comment (lib,"Ws2_32.lib")
+#pragma comment (lib,"Wldap32.lib")
+#pragma comment (lib,"Crypt32.lib")
+
 // Windows-specific headers for networking
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #pragma comment(lib, "ws2_32.lib")
+
+using json = nlohmann::json;
 
 // Error handling utilities
 enum class ErrorCode {
@@ -77,6 +85,18 @@ struct Notam {
     char endTime[20];
     AirspaceInfo affectedAirspace;
     char description[256];
+};
+
+struct WeatherConditions {
+    int conditionCode;
+    char description[100];
+    double visibility;
+    double temperature;
+};
+
+struct WeatherStatus {
+    bool weatherGood;
+    std::string weatherMessage;
 };
 
 // Connection request handling
@@ -275,11 +295,124 @@ public:
     }
 };
 
+class WeatherProcessor {
+private:
+
+    WeatherConditions& conditions_;
+    std::string apiKey_;
+
+    // Callback function to handle API response
+    static size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* output) {
+        size_t total_size = size * nmemb;
+        output->append((char*)contents, total_size);
+        return total_size;
+    }
+
+public:
+
+    WeatherProcessor(WeatherConditions& conditions, const std::string& apiKey)
+        : conditions_(conditions), apiKey_(apiKey) {}
+
+    // Fetch weather data from API
+    std::string fetchWeatherData(double latitude, double longitude) {
+        CURL* curl;
+        CURLcode res;
+        std::string response_data;
+
+        std::string url = "https://api.openweathermap.org/data/2.5/weather?lat="
+            + std::to_string(latitude) + "&lon=" + std::to_string(longitude)
+            + "&units=metric&appid=" + apiKey_;
+
+        curl = curl_easy_init();
+        if (curl) {
+            curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_data);
+            curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+            curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10L);
+
+            res = curl_easy_perform(curl);
+            if (res != CURLE_OK) {
+                std::cerr << "Request failed: " << curl_easy_strerror(res) << std::endl;
+            }
+
+            curl_easy_cleanup(curl);
+        }
+        else {
+            std::cerr << "Failed to initialize cURL" << std::endl;
+        }
+
+        return response_data;
+    }
+
+    // Parse JSON and populate the WeatherConditions struct
+    void parseWeatherData(const std::string& jsonData) {
+        try {
+            json parsedJson = json::parse(jsonData);
+
+            if (!parsedJson["weather"].empty()) {
+                conditions_.conditionCode = parsedJson["weather"][0]["id"];
+                std::string desc = parsedJson["weather"][0]["description"];
+                strncpy(conditions_.description, desc.c_str(), sizeof(conditions_.description) - 1);
+                conditions_.description[sizeof(conditions_.description) - 1] = '\0'; // Ensure null termination
+            }
+
+            conditions_.visibility = parsedJson.value("visibility", 0.0);
+            conditions_.temperature = parsedJson["main"].value("temp", 0.0);
+        }
+        catch (const std::exception& e) {
+            std::cerr << "Error parsing JSON: " << e.what() << std::endl;
+        }
+    }
+
+    // Public function to update weather conditions
+    void updateWeather(double latitude, double longitude) {
+        std::string jsonData = fetchWeatherData(latitude, longitude);
+        if (!jsonData.empty()) {
+            parseWeatherData(jsonData);
+        }
+        else {
+            std::cerr << "Error: Received empty weather data" << std::endl;
+        }
+    }
+
+    // Determine if weather conditions are safe
+    WeatherStatus isWeatherGood() {
+        WeatherStatus status;
+        status.weatherGood = true;
+        status.weatherMessage.clear();
+
+        // Condition codes that are not safe
+        std::set<int> badConditionCodes = { 202, 212, 221, 232, 302, 312, 314, 503, 504, 522, 531, 602, 622, 781 };
+
+        if (badConditionCodes.find(conditions_.conditionCode) != badConditionCodes.end()) {
+            status.weatherMessage += "Dangerous weather conditions detected: " + std::string(conditions_.description) + "\n";
+            status.weatherGood = false;
+        }
+
+        // Check visibility
+        if (conditions_.visibility <= 4828) {
+            status.weatherMessage += "Reduced visibility detected: " + std::to_string(conditions_.visibility) + " meters\n";
+            status.weatherGood = false;
+        }
+
+        // Check temperature
+        if (conditions_.temperature < -40) {
+            status.weatherMessage += "Extreme low temperature detected: " + std::to_string(conditions_.temperature) + "°C\n";
+            status.weatherGood = false;
+        }
+
+        return status;
+    }
+
+};
+
 // Handle client message processing
 class FlightDataHandler {
 private:
     NotamProcessor& notamProcessor_;
     ConnectionManager& connectionManager_;
+    WeatherProcessor& weatherProcessor_;
 
     std::vector<AirspaceInfo> getRouteAirspaces(const char* departure, const char* arrival) const {
         std::vector<AirspaceInfo> airspaces;
@@ -364,8 +497,8 @@ private:
     }
 
 public:
-    explicit FlightDataHandler(NotamProcessor& processor, ConnectionManager& connManager)
-        : notamProcessor_(processor), connectionManager_(connManager) {
+    explicit FlightDataHandler(NotamProcessor& processor, ConnectionManager& connManager, WeatherProcessor& weatherProcessor)
+        : notamProcessor_(processor), connectionManager_(connManager), weatherProcessor_(weatherProcessor) {
         // No initialization needed
     }
 
@@ -418,6 +551,17 @@ public:
         for (const Notam* notam : relevantNotams) {
             response << "NOTAM: " << notam->identifier << " for " << notam->location;
             response << " - " << notam->description << "\n";
+        }
+
+        // Check weather conditions
+        weatherProcessor_.updateWeather(flightPlan.routeAirspaces[0].center.latitude, flightPlan.routeAirspaces[0].center.longitude);
+        WeatherStatus status = weatherProcessor_.isWeatherGood();
+
+        if (status.weatherGood) {
+            response << "WEATHER UPDATE: Current conditions are favorable for flight operations.\n";
+        }
+        else {
+            response << "WEATHER WARNING:\n" << status.weatherMessage;
         }
 
         return response.str();
@@ -649,8 +793,17 @@ int32_t main(int argc, char* argv[]) {
     // Initialize NOTAM processor
     NotamProcessor processor(notamDb);
 
+	// api key for openweathermap
+    std::string apiKey = "445b28699592a8c90c07b345dd4de9cd";
+
+	// Initialize weather conditions
+	WeatherConditions conditions;
+
+	// Initialize weather processor
+	WeatherProcessor weatherProcessor(conditions, apiKey);
+
     // Initialize flight data handler
-    FlightDataHandler handler(processor, connectionManager);
+    FlightDataHandler handler(processor, connectionManager, weatherProcessor);
 
     // Start the TCP server
     TcpServer server(handler, connectionManager);
