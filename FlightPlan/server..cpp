@@ -11,6 +11,7 @@
 #include <mutex>
 
 #include <nlohmann/json.hpp>
+
 #define CURL_STATICLIB
 #include "curl/curl.h"
 
