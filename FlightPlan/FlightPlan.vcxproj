@@ -19,7 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="server..cpp" />
+    <ClCompile Include="server.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -114,11 +117,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\vcpkg\packages\zlib_x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>C:\curl-8.12.1\builds\libcurl-vc15-x64-debug-static-ipv6-sspi-schannel\lib\libcurl_a_debug.lib;C:\curl-8.12.1\builds\libcurl-vc15-x64-release-static-ipv6-sspi-schannel\lib\libcurl_a.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\vcpkg\packages\zlib_x64-windows\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -141,11 +146,13 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\nlohmann.json.3.11.3\build\native\nlohmann.json.targets" Condition="Exists('..\packages\nlohmann.json.3.11.3\build\native\nlohmann.json.targets')" />
+    <Import Project="..\packages\libcurl.NET.x64.1.4.1.0\build\libcurl.NET.x64.targets" Condition="Exists('..\packages\libcurl.NET.x64.1.4.1.0\build\libcurl.NET.x64.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\nlohmann.json.3.11.3\build\native\nlohmann.json.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\nlohmann.json.3.11.3\build\native\nlohmann.json.targets'))" />
+    <Error Condition="!Exists('..\packages\libcurl.NET.x64.1.4.1.0\build\libcurl.NET.x64.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libcurl.NET.x64.1.4.1.0\build\libcurl.NET.x64.targets'))" />
   </Target>
 </Project>

@@ -19,4 +19,14 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="$(MSBuildThisFileDirectory)\libcurl.dll" />
+    <None Include="$(MSBuildThisFileDirectory)\LibCurlShim.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="packet_utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>

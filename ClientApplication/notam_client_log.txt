@@ -1,0 +1,590 @@
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-29 09:14:09
+=================================================
+[09:14:09] NotamClient initialized
+[09:14:09] Winsock initialized successfully
+[09:14:09] Generated client ID: F661
+[09:14:09] Attempting to connect to server at 127.0.0.1:8081
+[09:14:09] Connected to server successfully
+[09:14:09] Sending connection request for client ID: F661
+
+----- SENT PACKET [09:14:09] -----
+Description: Connection Request
+HEADER
+SEQ_NUM=1
+TIMESTAMP=2025-03-29T09:14:09.%fZ
+PAYLOAD_SIZE=34
+END_HEADER
+REQUEST_CONNECTION
+CLIENT_ID=F661
+
+----- END OF SENT PACKET -----
+[09:14:09] Waiting to receive response from server
+
+----- RECEIVED PACKET [09:14:09] -----
+Description: Server Response (20 bytes)
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+
+----- RECEIVED PACKET [09:14:09] -----
+Description: Connection Response
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+[09:14:09] Connection request approved by server
+[09:14:11] Sending extended flight information for flight: F661 from CYKF to CYUL
+
+----- SENT PACKET [09:14:11] -----
+Description: Flight Plan
+HEADER
+SEQ_NUM=2
+TIMESTAMP=2025-03-29T09:14:11.%fZ
+PAYLOAD_SIZE=263
+END_HEADER
+FLIGHT_PLAN
+FLIGHT_NUMBER=F661
+AIRCRAFT_REG=C-FFXK
+AIRCRAFT_TYPE=Boeing 737-800
+OPERATOR=Air Canada
+DEP=CYKF
+ARR=CYUL
+LAYOVER=CYUL
+ROUTE=CYKF-DIRCK-CYUL-DIRECT
+CRUISE_ALT=35000
+SPEED=461
+EOBT=2025-03-29T09:14:11Z
+ETD=2025-03-29T09:14:11Z
+ETA=2025-03-29T09:14:11Z
+
+----- END OF SENT PACKET -----
+
+----- SENT PACKET [09:14:11] -----
+Description: Flight Log
+HEADER
+SEQ_NUM=3
+TIMESTAMP=2025-03-29T09:14:11.%fZ
+PAYLOAD_SIZE=451
+END_HEADER
+FLIGHT_LOG
+FLIGHT_NUMBER=F661
+TOTAL_FLIGHT_TIME=2h45m
+FUEL_ON_BOARD=20500
+ESTIMATED_FUEL_BURN=18750
+TOTAL_WEIGHT=79500
+PIC=Capt. John Anderson
+REMARKS=Smooth flight conditions, minor turbulence at FL320
+WEATHER_INFO=
+  DEP_VISIBILITY=10SM
+  ARR_VISIBILITY=8SM
+  AVG_TEMP=15C
+  TEMP_RANGE=10-20C
+  WIND_SPEED=15KTS
+  WIND_DIR=240DEG
+  WIND_GUST=22KTS
+  CLOUDS=Scattered at 5000FT
+  PRECIPITATION=Light Rain
+  TIMEZONE=EST
+  AIRSPACE=Controlled Class A
+
+----- END OF SENT PACKET -----
+[09:14:11] Flight information sent successfully
+[09:14:11] Waiting to receive response from server
+
+----- RECEIVED PACKET [09:14:11] -----
+Description: Server Response (144 bytes)
+NOTAMS AFFECTING YOUR FLIGHT:
+NOTAM: C0092/25 for CYUL - RADAR MAINTENANCE EXPECT ILS APPROACHES ONLY
+NOTAM: D0056/25 for CYOW - VOR/DME OW U/S
+
+----- END OF RECEIVED PACKET -----
+[09:14:11] Disconnecting from server
+[09:14:11] Disconnected from server
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-29 14:46:10
+=================================================
+[14:46:10] NotamClient initialized
+[14:46:10] Winsock initialized successfully
+[14:46:10] Generated client ID: F1100
+[14:46:10] Attempting to connect to server at 127.0.0.1:8081
+[14:46:10] Connected to server successfully
+[14:46:10] Sending connection request for client ID: F1100
+
+----- SENT PACKET [14:46:10] -----
+Description: Connection Request
+HEADER
+SEQ_NUM=1
+TIMESTAMP=2025-03-29T14:46:10.%fZ
+PAYLOAD_SIZE=35
+END_HEADER
+REQUEST_CONNECTION
+CLIENT_ID=F1100
+
+----- END OF SENT PACKET -----
+[14:46:10] Waiting to receive response from server
+
+----- RECEIVED PACKET [14:46:10] -----
+Description: Server Response (20 bytes)
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+
+----- RECEIVED PACKET [14:46:10] -----
+Description: Connection Response
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+[14:46:10] Connection request approved by server
+[14:46:29] Sending extended flight information for flight: F1100 from CYYZ to KJFK
+
+----- SENT PACKET [14:46:29] -----
+Description: Flight Plan
+HEADER
+SEQ_NUM=2
+TIMESTAMP=2025-03-29T14:46:29.%fZ
+PAYLOAD_SIZE=264
+END_HEADER
+FLIGHT_PLAN
+FLIGHT_NUMBER=F1100
+AIRCRAFT_REG=C-FFXK
+AIRCRAFT_TYPE=Boeing 737-800
+OPERATOR=Air Canada
+DEP=CYYZ
+ARR=KJFK
+LAYOVER=CYUL
+ROUTE=CYYZ-DIRCK-CYUL-DIRECT
+CRUISE_ALT=35000
+SPEED=461
+EOBT=2025-03-29T14:46:29Z
+ETD=2025-03-29T14:46:29Z
+ETA=2025-03-29T14:46:29Z
+
+----- END OF SENT PACKET -----
+
+----- SENT PACKET [14:46:30] -----
+Description: Flight Log
+HEADER
+SEQ_NUM=3
+TIMESTAMP=2025-03-29T14:46:30.%fZ
+PAYLOAD_SIZE=452
+END_HEADER
+FLIGHT_LOG
+FLIGHT_NUMBER=F1100
+TOTAL_FLIGHT_TIME=2h45m
+FUEL_ON_BOARD=20500
+ESTIMATED_FUEL_BURN=18750
+TOTAL_WEIGHT=79500
+PIC=Capt. John Anderson
+REMARKS=Smooth flight conditions, minor turbulence at FL320
+WEATHER_INFO=
+  DEP_VISIBILITY=10SM
+  ARR_VISIBILITY=8SM
+  AVG_TEMP=15C
+  TEMP_RANGE=10-20C
+  WIND_SPEED=15KTS
+  WIND_DIR=240DEG
+  WIND_GUST=22KTS
+  CLOUDS=Scattered at 5000FT
+  PRECIPITATION=Light Rain
+  TIMEZONE=EST
+  AIRSPACE=Controlled Class A
+
+----- END OF SENT PACKET -----
+[14:46:30] Flight information sent successfully
+[14:46:30] Waiting to receive response from server
+
+----- RECEIVED PACKET [14:46:30] -----
+Description: Server Response (227 bytes)
+NOTAMS AFFECTING YOUR FLIGHT:
+NOTAM: A0245/25 for CYYZ - RWY 05/23 CLSD DUE SNOW REMOVAL
+NOTAM: B0178/25 for KBUF - TEMPO FLIGHT RESTRICTIONS DUE AIRSHOW PRACTICE
+NOTAM: E0211/25 for KJFK - CRANE OPERATIONS EAST OF RWY 13L/31R
+
+----- END OF RECEIVED PACKET -----
+[14:46:30] Disconnecting from server
+[14:46:30] Disconnected from server
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-31 15:19:41
+=================================================
+[15:19:41] NotamClient initialized
+[15:19:41] Winsock initialized successfully
+[15:19:41] Generated client ID: F3383
+[15:19:41] Attempting to connect to server at 127.0.0.1:8081
+[15:19:41] Connected to server successfully
+[15:19:41] Sending connection request for client ID: F3383
+
+----- SENT PACKET [15:19:41] -----
+Description: Connection Request
+HEADER
+SEQ_NUM=1
+TIMESTAMP=2025-03-31T15:19:41.%fZ
+PAYLOAD_SIZE=35
+END_HEADER
+REQUEST_CONNECTION
+CLIENT_ID=F3383
+
+----- END OF SENT PACKET -----
+[15:19:41] Waiting to receive response from server
+
+----- RECEIVED PACKET [15:19:41] -----
+Description: Server Response (20 bytes)
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+
+----- RECEIVED PACKET [15:19:41] -----
+Description: Connection Response
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+[15:19:41] Connection request approved by server
+[15:19:57] Sending extended flight information for flight: F3383 from CYKF to CYUL
+
+----- SENT PACKET [15:19:57] -----
+Description: Flight Plan
+HEADER
+SEQ_NUM=2
+TIMESTAMP=2025-03-31T15:19:57.%fZ
+PAYLOAD_SIZE=264
+END_HEADER
+FLIGHT_PLAN
+FLIGHT_NUMBER=F3383
+AIRCRAFT_REG=C-FFXK
+AIRCRAFT_TYPE=Boeing 737-800
+OPERATOR=Air Canada
+DEP=CYKF
+ARR=CYUL
+LAYOVER=CYUL
+ROUTE=CYKF-DIRCK-CYUL-DIRECT
+CRUISE_ALT=35000
+SPEED=461
+EOBT=2025-03-31T15:19:57Z
+ETD=2025-03-31T15:19:57Z
+ETA=2025-03-31T15:19:57Z
+
+----- END OF SENT PACKET -----
+
+----- SENT PACKET [15:19:58] -----
+Description: Flight Log
+HEADER
+SEQ_NUM=3
+TIMESTAMP=2025-03-31T15:19:58.%fZ
+PAYLOAD_SIZE=452
+END_HEADER
+FLIGHT_LOG
+FLIGHT_NUMBER=F3383
+TOTAL_FLIGHT_TIME=2h45m
+FUEL_ON_BOARD=20500
+ESTIMATED_FUEL_BURN=18750
+TOTAL_WEIGHT=79500
+PIC=Capt. John Anderson
+REMARKS=Smooth flight conditions, minor turbulence at FL320
+WEATHER_INFO=
+  DEP_VISIBILITY=10SM
+  ARR_VISIBILITY=8SM
+  AVG_TEMP=15C
+  TEMP_RANGE=10-20C
+  WIND_SPEED=15KTS
+  WIND_DIR=240DEG
+  WIND_GUST=22KTS
+  CLOUDS=Scattered at 5000FT
+  PRECIPITATION=Light Rain
+  TIMEZONE=EST
+  AIRSPACE=Controlled Class A
+
+----- END OF SENT PACKET -----
+[15:19:58] Flight information sent successfully
+[15:19:58] Waiting to receive response from server
+
+----- RECEIVED PACKET [15:19:58] -----
+Description: Server Response (144 bytes)
+NOTAMS AFFECTING YOUR FLIGHT:
+NOTAM: C0092/25 for CYUL - RADAR MAINTENANCE EXPECT ILS APPROACHES ONLY
+NOTAM: D0056/25 for CYOW - VOR/DME OW U/S
+
+----- END OF RECEIVED PACKET -----
+[15:19:58] Disconnecting from server
+[15:19:58] Disconnected from server
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-31 16:27:47
+=================================================
+[16:27:47] NotamClient initialized
+[16:27:47] Winsock initialized successfully
+[16:27:47] Generated client ID: F2988
+[16:27:52] Attempting to connect to server at 127.0.0.1:8081
+[16:27:52] Connected to server successfully
+[16:27:53] Sending connection request for client ID: F2988
+
+----- SENT PACKET [16:27:53] -----
+Description: Connection Request
+HEADER
+SEQ_NUM=1
+TIMESTAMP=2025-03-31T16:27:53.%fZ
+PAYLOAD_SIZE=35
+END_HEADER
+REQUEST_CONNECTION
+CLIENT_ID=F2988
+
+----- END OF SENT PACKET -----
+[16:27:53] Waiting to receive response from server
+
+----- RECEIVED PACKET [16:27:53] -----
+Description: Server Response (20 bytes)
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+
+----- RECEIVED PACKET [16:27:53] -----
+Description: Connection Response
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+[16:27:53] Connection request approved by server
+[16:27:56] Sending extended flight information for flight: F2988 from CYKF to CYUL
+
+----- SENT PACKET [16:28:11] -----
+Description: Flight Plan
+HEADER
+SEQ_NUM=2
+TIMESTAMP=2025-03-31T16:28:11.%fZ
+PAYLOAD_SIZE=153
+END_HEADER
+FLIGHT_PLAN
+FLIGHT_NUMBER=F2988
+AIRCRAFT_REG=1
+AIRCRAFT_TYPE=1
+OPERATOR=1
+DEP=CYKF
+ARR=CYUL
+LAYOVER=CYUL
+ROUTE=1
+CRUISE_ALT=1
+SPEED=1
+EOBT=1
+ETD=1
+ETA=1
+
+----- END OF SENT PACKET -----
+
+----- SENT PACKET [16:28:17] -----
+Description: Flight Log
+HEADER
+SEQ_NUM=3
+TIMESTAMP=2025-03-31T16:28:17.%fZ
+PAYLOAD_SIZE=120
+END_HEADER
+FLIGHT_LOG
+FLIGHT_NUMBER=F2988
+TOTAL_FLIGHT_TIME=1
+FUEL_ON_BOARD=1
+ESTIMATED_FUEL_BURN=1
+TOTAL_WEIGHT=1
+PIC=1
+REMARKS=1
+
+----- END OF SENT PACKET -----
+[16:28:17] Flight information sent successfully
+[16:28:19] Waiting to receive response from server
+
+----- RECEIVED PACKET [16:28:19] -----
+Description: Server Response (144 bytes)
+NOTAMS AFFECTING YOUR FLIGHT:
+NOTAM: C0092/25 for CYUL - RADAR MAINTENANCE EXPECT ILS APPROACHES ONLY
+NOTAM: D0056/25 for CYOW - VOR/DME OW U/S
+
+----- END OF RECEIVED PACKET -----
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-31 16:49:57
+=================================================
+[16:49:57] NotamClient initialized
+[16:49:57] Winsock initialized successfully
+[16:49:57] Generated client ID: F1589
+[16:50:04] Attempting to connect to server at 127.0.0.1:8081
+[16:50:04] Connected to server successfully
+[16:50:05] Sending connection request for client ID: F1589
+
+----- SENT PACKET [16:50:05] -----
+Description: Connection Request
+HEADER
+SEQ_NUM=1
+TIMESTAMP=2025-03-31T16:50:05.%fZ
+PAYLOAD_SIZE=35
+END_HEADER
+REQUEST_CONNECTION
+CLIENT_ID=F1589
+
+----- END OF SENT PACKET -----
+[16:50:05] Waiting to receive response from server
+
+----- RECEIVED PACKET [16:50:05] -----
+Description: Server Response (20 bytes)
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+
+----- RECEIVED PACKET [16:50:05] -----
+Description: Connection Response
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+[16:50:05] Connection request approved by server
+[16:50:06] Sending extended flight information for flight: F1589 from CYYZ to KJFK
+
+----- SENT PACKET [16:50:10] -----
+Description: Flight Plan
+HEADER
+SEQ_NUM=2
+TIMESTAMP=2025-03-31T16:50:10.%fZ
+PAYLOAD_SIZE=153
+END_HEADER
+FLIGHT_PLAN
+FLIGHT_NUMBER=F1589
+AIRCRAFT_REG=1
+AIRCRAFT_TYPE=1
+OPERATOR=1
+DEP=CYYZ
+ARR=KJFK
+LAYOVER=CYUL
+ROUTE=1
+CRUISE_ALT=1
+SPEED=1
+EOBT=1
+ETD=1
+ETA=1
+
+----- END OF SENT PACKET -----
+
+----- SENT PACKET [16:50:14] -----
+Description: Flight Log
+HEADER
+SEQ_NUM=3
+TIMESTAMP=2025-03-31T16:50:14.%fZ
+PAYLOAD_SIZE=120
+END_HEADER
+FLIGHT_LOG
+FLIGHT_NUMBER=F1589
+TOTAL_FLIGHT_TIME=1
+FUEL_ON_BOARD=1
+ESTIMATED_FUEL_BURN=1
+TOTAL_WEIGHT=1
+PIC=1
+REMARKS=1
+
+----- END OF SENT PACKET -----
+[16:50:14] Flight information sent successfully
+[16:50:16] Waiting to receive response from server
+
+----- RECEIVED PACKET [16:50:16] -----
+Description: Server Response (227 bytes)
+NOTAMS AFFECTING YOUR FLIGHT:
+NOTAM: A0245/25 for CYYZ - RWY 05/23 CLSD DUE SNOW REMOVAL
+NOTAM: B0178/25 for KBUF - TEMPO FLIGHT RESTRICTIONS DUE AIRSHOW PRACTICE
+NOTAM: E0211/25 for KJFK - CRANE OPERATIONS EAST OF RWY 13L/31R
+
+----- END OF RECEIVED PACKET -----
+[16:50:18] Disconnecting from server
+[16:50:18] Disconnected from server
+[16:50:18] Winsock cleaned up
+
+----- LOG SESSION ENDED -----
+
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-31 17:29:11
+=================================================
+[17:29:11] NotamClient initialized
+[17:29:11] Winsock initialized successfully
+[17:29:11] Generated client ID: F4040
+[17:29:35] Attempting to connect to server at 127.0.0.1:8081
+[17:29:35] Connected to server successfully
+[17:29:36] Sending connection request for client ID: F4040
+
+----- SENT PACKET [17:29:36] -----
+Description: Connection Request
+HEADER
+SEQ_NUM=1
+TIMESTAMP=2025-03-31T17:29:36.%fZ
+PAYLOAD_SIZE=35
+END_HEADER
+REQUEST_CONNECTION
+CLIENT_ID=F4040
+
+----- END OF SENT PACKET -----
+[17:29:36] Waiting to receive response from server
+
+----- RECEIVED PACKET [17:29:36] -----
+Description: Server Response (20 bytes)
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+
+----- RECEIVED PACKET [17:29:36] -----
+Description: Connection Response
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+[17:29:36] Connection request approved by server
+[17:29:44] Sending extended flight information for flight: F4040 from CYKF to CYUL
+
+----- SENT PACKET [17:29:53] -----
+Description: Flight Plan
+HEADER
+SEQ_NUM=2
+TIMESTAMP=2025-03-31T17:29:53.%fZ
+PAYLOAD_SIZE=153
+END_HEADER
+FLIGHT_PLAN
+FLIGHT_NUMBER=F4040
+AIRCRAFT_REG=1
+AIRCRAFT_TYPE=1
+OPERATOR=1
+DEP=CYKF
+ARR=CYUL
+LAYOVER=CYUL
+ROUTE=1
+CRUISE_ALT=1
+SPEED=1
+EOBT=1
+ETD=1
+ETA=1
+
+----- END OF SENT PACKET -----
+
+----- SENT PACKET [17:29:56] -----
+Description: Flight Log
+HEADER
+SEQ_NUM=3
+TIMESTAMP=2025-03-31T17:29:56.%fZ
+PAYLOAD_SIZE=120
+END_HEADER
+FLIGHT_LOG
+FLIGHT_NUMBER=F4040
+TOTAL_FLIGHT_TIME=1
+FUEL_ON_BOARD=1
+ESTIMATED_FUEL_BURN=1
+TOTAL_WEIGHT=1
+PIC=1
+REMARKS=1
+
+----- END OF SENT PACKET -----
+[17:29:56] Flight information sent successfully
+[17:29:58] Waiting to receive response from server
+
+----- RECEIVED PACKET [17:29:58] -----
+Description: Server Response (144 bytes)
+NOTAMS AFFECTING YOUR FLIGHT:
+NOTAM: C0092/25 for CYUL - RADAR MAINTENANCE EXPECT ILS APPROACHES ONLY
+NOTAM: D0056/25 for CYOW - VOR/DME OW U/S
+
+----- END OF RECEIVED PACKET -----
+[17:30:02] Disconnecting from server
+[17:30:02] Disconnected from server
+[17:30:02] Winsock cleaned up
+
+----- LOG SESSION ENDED -----
+

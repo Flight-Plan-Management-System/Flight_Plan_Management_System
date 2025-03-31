@@ -15,8 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="server..cpp">
+    <ClCompile Include="server.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="$(MSBuildThisFileDirectory)\libcurl.dll" />
+    <None Include="$(MSBuildThisFileDirectory)\LibCurlShim.dll" />
   </ItemGroup>
 </Project>
