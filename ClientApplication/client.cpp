@@ -610,3 +610,358 @@ public:
     }
 };
 
+
+
+
+void clearScreen() {
+#ifdef _WIN32
+    HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (hStdOut != INVALID_HANDLE_VALUE) {
+        CONSOLE_SCREEN_BUFFER_INFO csbi;
+        DWORD count;
+        DWORD cellCount;
+        COORD homeCoords = { 0, 0 };
+
+        if (GetConsoleScreenBufferInfo(hStdOut, &csbi)) {
+            cellCount = csbi.dwSize.X * csbi.dwSize.Y;
+            FillConsoleOutputCharacter(hStdOut, (TCHAR)' ', cellCount, homeCoords, &count);
+            FillConsoleOutputAttribute(hStdOut, csbi.wAttributes, cellCount, homeCoords, &count);
+            SetConsoleCursorPosition(hStdOut, homeCoords);
+        }
+    }
+#else
+
+    std::cout << "\033[2J\033[1;1H";
+#endif
+}
+
+void printHeader() {
+    clearScreen();
+    std::cout << "╔════════════════════════════════════════════════════════╗\n";
+    std::cout << "║                 NOTAM CLIENT APPLICATION                ║\n";
+    std::cout << "╚════════════════════════════════════════════════════════╝\n\n";
+}
+
+void printProgressBar(int percentage) {
+
+    if (percentage < 0) {
+        percentage = 0;
+    }
+    if (percentage > 100) {
+        percentage = 100;
+    }
+
+    int barWidth = PROGRESS_BAR_WIDTH;
+    std::cout << "[";
+    int pos = barWidth * percentage / 100;
+    for (int i = 0; i < barWidth; ++i) {
+        if (i < pos) {
+            std::cout << "=";
+        }
+        else if (i == pos) {
+            std::cout << ">";
+        }
+        else {
+            std::cout << " ";
+        }
+    }
+    std::cout << "] " << percentage << " %\r";
+    std::cout.flush();
+}
+
+void showSpinner(const std::string& message, int seconds) {
+    if (seconds <= 0) {
+        return;
+    }
+
+    const char spinner[] = { '|', '/', '-', '\\' };
+    int i = 0;
+
+    std::cout << message;
+
+    for (int j = 0; j < seconds * 4; ++j) {
+        std::cout << " " << spinner[i % 4] << "\r";
+        std::cout << message;
+        std::cout.flush();
+        std::this_thread::sleep_for(std::chrono::milliseconds(SPINNER_INTERVAL_MS));
+        ++i;
+    }
+    std::cout << std::endl;
+}
+
+void printSection(const std::string& title) {
+    std::cout << "\n┌─────────────────────────────────────────────────────┐\n";
+    std::cout << "│ " << std::left << std::setw(51) << title << "│\n";
+    std::cout << "└─────────────────────────────────────────────────────┘\n";
+}
+
+void printSuccess(const std::string& message) {
+    std::cout << "✓ " << message << std::endl;
+}
+
+void printError(const std::string& message) {
+    std::cout << "✗ " << message << std::endl;
+}
+
+void printInfo(const std::string& message) {
+    std::cout << "ℹ " << message << std::endl;
+}
+
+std::string getInput(const std::string& prompt) {
+    std::string input;
+    std::cout << prompt;
+    std::getline(std::cin, input);
+    return input;
+}
+
+char getCharInput(const std::string& prompt) {
+    std::string input;
+    std::cout << prompt;
+    std::getline(std::cin, input);
+    return input.empty() ? '\0' : input[0];
+}
+
+int getIntInput(const std::string& prompt) {
+    std::string input;
+    int value = 0;
+    bool validInput = false;
+
+    while (!validInput) {
+        std::cout << prompt;
+        std::getline(std::cin, input);
+
+        try {
+            size_t pos = 0;
+
+            value = std::stoi(input, &pos);
+
+
+            if (pos == input.size()) {
+                validInput = true;
+            }
+            else {
+                printError("Invalid input. Please enter a valid number.");
+            }
+        }
+        catch (const std::invalid_argument&) {
+            printError("Invalid input. Please enter a number.");
+        }
+        catch (const std::out_of_range&) {
+            printError("Number out of range. Please enter a smaller number.");
+        }
+    }
+
+    return value;
+}
+
+
+bool setupServerConnection(NotamClient& client, std::string& serverIP, int& serverPort) {
+    printSection("SERVER CONNECTION SETUP");
+
+    char choice = getCharInput("Use default server settings (127.0.0.1:8081)? (y/n): ");
+
+    if (choice == 'n' || choice == 'N') {
+        serverIP = getInput("Enter server IP address: ");
+        serverPort = getIntInput("Enter server port: ");
+    }
+
+    printInfo("Connecting to NOTAM server at " + serverIP + ":" + std::to_string(serverPort));
+
+
+    for (int i = 0; i <= 100; i += 10) {
+        printProgressBar(i);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+    std::cout << std::endl;
+
+    ErrorCode result = client.connect(serverIP, serverPort);
+    if (result != ErrorCode::SUCCESS) {
+        printError("Failed to connect to server.");
+
+        choice = getCharInput("Would you like to retry connecting? (y/n): ");
+        if (choice == 'y' || choice == 'Y') {
+            showSpinner("Attempting to reconnect", 2);
+            return client.retryConnection(serverIP, serverPort, MAX_RETRY_ATTEMPTS);
+        }
+        else {
+            return false;
+        }
+    }
+
+    printSuccess("Connected successfully!");
+
+
+    printInfo("Requesting connection approval from the server...");
+    showSpinner("Waiting for server approval", 1);
+
+    result = client.requestConnection();
+    if (result != ErrorCode::SUCCESS) {
+        printError("Failed to get connection approval from server.");
+
+        choice = getCharInput("Would you like to retry after waiting? (y/n): ");
+        if (choice == 'y' || choice == 'Y') {
+            showSpinner("Preparing to retry connection", 2);
+            return client.retryConnection(serverIP, serverPort, MAX_RETRY_ATTEMPTS);
+        }
+        else {
+            client.disconnect();
+            return false;
+        }
+    }
+
+    printSuccess("Connection approved by server!");
+    return true;
+}
+
+
+bool selectFlight(std::string& flightId, std::string& departure, std::string& arrival)
+{
+    printSection("FLIGHT SELECTION");
+
+    std::cout << "Select a flight to check NOTAMs:\n\n";
+    std::cout << "  1. Toronto (CYYZ) to New York (KJFK)\n";
+    std::cout << "  2. Waterloo (CYKF) to Montreal (CYUL)\n";
+    std::cout << "  3. Custom flight\n\n";
+
+    int flightChoice = getIntInput("Enter your choice (1-3): ");
+
+    bool isValidSelection = true;
+
+
+    if (1 == flightChoice)
+    {
+        departure = "CYYZ";
+        arrival = "KJFK";
+        printSuccess("Selected flight: Toronto (CYYZ) to New York (KJFK)");
+    }
+    else if (2 == flightChoice)
+    {
+        departure = "CYKF";
+        arrival = "CYUL";
+        printSuccess("Selected flight: Waterloo (CYKF) to Montreal (CYUL)");
+    }
+    else if (3 == flightChoice)
+    {
+        departure = getInput("Enter departure airport code (e.g., CYYZ): ");
+        arrival = getInput("Enter arrival airport code (e.g., KJFK): ");
+        printSuccess("Selected flight: " + departure + " to " + arrival);
+    }
+    else
+    {
+        printError("Invalid selection. Please try again.");
+        isValidSelection = false;
+    }
+
+    return isValidSelection;
+}
+
+
+void displayNotamInfo(const std::string& response, const std::string& flightId)
+{
+    printSection("NOTAM INFORMATION");
+
+    std::cout << "╔════════════════════════════════════════════════════════╗\n";
+    std::cout << "║             NOTAM INFO FOR FLIGHT " << std::left << std::setw(17) << flightId << "║\n";
+    std::cout << "╠════════════════════════════════════════════════════════╣\n";
+
+
+    std::istringstream responseStream(response);
+    std::string line;
+
+    while (std::getline(responseStream, line))
+    {
+        if (0 < line.length())
+        {
+            std::cout << "║ " << std::left << std::setw(52) << line << "║\n";
+        }
+    }
+
+    std::cout << "╚════════════════════════════════════════════════════════╝\n";
+}
+
+int main(void)
+{
+
+    std::string serverIP = "127.0.0.1";
+    int serverPort = DEFAULT_SERVER_PORT;
+    std::string flightId;
+    std::string departure;
+    std::string arrival;
+    int returnCode = 0;
+
+
+    NotamClient client;
+
+
+    printHeader();
+
+
+    printInfo("Your client ID is: " + client.getClientId());
+
+
+    if (!setupServerConnection(client, serverIP, serverPort))
+    {
+        printError("Failed to establish connection with the NOTAM server.");
+        returnCode = 1;
+    }
+    else
+    {
+
+        flightId = client.getClientId();
+
+        if (!selectFlight(flightId, departure, arrival))
+        {
+            printError("Flight selection failed.");
+            client.disconnect();
+            returnCode = 1;
+        }
+        else
+        {
+
+            printSection("SENDING FLIGHT INFORMATION");
+            printInfo("Preparing to send extended flight information to server...");
+
+            ErrorCode result = client.sendExtendedFlightInformation(flightId, departure, arrival);
+
+            if (ErrorCode::SUCCESS != result)
+            {
+                printError("Failed to send flight information.");
+                client.disconnect();
+                returnCode = 1;
+            }
+            else
+            {
+                printSuccess("Flight information sent successfully!");
+
+
+                printInfo("Waiting for NOTAM information from server...");
+                showSpinner("Processing NOTAM data", 2);
+
+                std::string response = client.receiveResponse();
+
+                if (std::string::npos != response.find("ERROR"))
+                {
+                    printError("Failed to receive NOTAM information.");
+                    client.disconnect();
+                    returnCode = 1;
+                }
+                else
+                {
+
+                    displayNotamInfo(response, flightId);
+
+
+                    printSection("CONNECTION COMPLETE");
+                    printInfo("Press Enter to disconnect and exit...");
+                    std::cin.get();
+                }
+            }
+        }
+    }
+
+    client.disconnect();
+    printSuccess("Disconnected from server. Goodbye!");
+
+    return returnCode;
+}
+
