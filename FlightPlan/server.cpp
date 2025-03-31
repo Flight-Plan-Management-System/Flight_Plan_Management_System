@@ -211,3 +211,164 @@ struct ConnectionRequest {
     }
 };
 
+class ConnectionManager {
+public:
+    static const size_t MAX_CONNECTIONS = 5;
+    std::set<std::string> activeClients;
+    std::mutex mutex;
+
+public:
+    bool canAcceptConnection() {
+        std::lock_guard<std::mutex> lock(mutex);
+        return activeClients.size() < MAX_CONNECTIONS;
+    }
+
+    bool addClient(const std::string& clientId) {
+        std::lock_guard<std::mutex> lock(mutex);
+        if (activeClients.size() >= MAX_CONNECTIONS) {
+            return false;
+        }
+        activeClients.insert(clientId);
+        return true;
+    }
+
+    void removeClient(const std::string& clientId) {
+        std::lock_guard<std::mutex> lock(mutex);
+        activeClients.erase(clientId);
+    }
+
+    size_t getActiveClientCount() {
+        std::lock_guard<std::mutex> lock(mutex);
+        return activeClients.size();
+    }
+};
+
+// NOTAM database
+class NotamDatabase {
+private:
+    std::vector<Notam> notams_;
+
+    bool parseNotamLine(const std::string& line, Notam& notam) {
+        std::istringstream iss(line);
+        std::string token;
+
+        // Skip comments and empty lines
+        if (line.empty() || line[0] == '#') {
+            return false;
+        }
+
+        // Parse pipe-delimited fields
+        // Format: NOTAM_ID|FIR|LOCATION|START_TIME|END_TIME|AFFECTED_AIRSPACE|LAT|LON|RADIUS|DESCRIPTION
+
+        // NOTAM ID
+        if (!std::getline(iss, token, '|')) return false;
+        strncpy(notam.identifier, token.c_str(), sizeof(notam.identifier) - 1);
+        notam.identifier[sizeof(notam.identifier) - 1] = '\0';
+
+        // FIR
+        if (!std::getline(iss, token, '|')) return false;
+        strncpy(notam.fir, token.c_str(), sizeof(notam.fir) - 1);
+        notam.fir[sizeof(notam.fir) - 1] = '\0';
+
+        // Location
+        if (!std::getline(iss, token, '|')) return false;
+        strncpy(notam.location, token.c_str(), sizeof(notam.location) - 1);
+        notam.location[sizeof(notam.location) - 1] = '\0';
+
+        // Start time
+        if (!std::getline(iss, token, '|')) return false;
+        strncpy(notam.startTime, token.c_str(), sizeof(notam.startTime) - 1);
+        notam.startTime[sizeof(notam.startTime) - 1] = '\0';
+
+        // End time
+        if (!std::getline(iss, token, '|')) return false;
+        strncpy(notam.endTime, token.c_str(), sizeof(notam.endTime) - 1);
+        notam.endTime[sizeof(notam.endTime) - 1] = '\0';
+
+        // Affected airspace
+        if (!std::getline(iss, token, '|')) return false;
+        strncpy(notam.affectedAirspace.identifier, token.c_str(),
+            sizeof(notam.affectedAirspace.identifier) - 1);
+        notam.affectedAirspace.identifier[sizeof(notam.affectedAirspace.identifier) - 1] = '\0';
+
+        // Latitude
+        if (!std::getline(iss, token, '|')) return false;
+        notam.affectedAirspace.center.latitude = std::stod(token);
+
+        // Longitude
+        if (!std::getline(iss, token, '|')) return false;
+        notam.affectedAirspace.center.longitude = std::stod(token);
+
+        // Radius
+        if (!std::getline(iss, token, '|')) return false;
+        notam.affectedAirspace.radius = std::stod(token);
+
+        // Description (rest of line)
+        if (!std::getline(iss, token)) return false;
+        strncpy(notam.description, token.c_str(), sizeof(notam.description) - 1);
+        notam.description[sizeof(notam.description) - 1] = '\0';
+
+        return true;
+    }
+
+public:
+    NotamDatabase(void) : notams_() {}
+
+    bool loadFromFile(const std::string& filename) {
+        std::ifstream file(filename);
+        if (!file.is_open()) {
+            return false;
+        }
+
+        std::string line;
+        while (std::getline(file, line)) {
+            Notam notam;
+            if (parseNotamLine(line, notam)) {
+                notams_.push_back(notam);
+            }
+        }
+
+        return true;
+    }
+
+    const std::vector<Notam>& getAllNotams(void) const {
+        return notams_;
+    }
+};
+
+// Process NOTAMs to determine if they affect a flight
+class NotamProcessor {
+private:
+    const NotamDatabase& notamDb_;
+
+    static bool isAirspaceAffected(const char* spaceId1, const char* spaceId2) {
+        return (0 == strcmp(spaceId1, spaceId2));
+    }
+
+public:
+    explicit NotamProcessor(const NotamDatabase& notamDb) : notamDb_(notamDb) {}
+
+    std::vector<const Notam*> getRelevantNotams(const FlightPlan& flightPlan) const {
+        std::vector<const Notam*> relevantNotams;
+        const std::vector<Notam>& allNotams = notamDb_.getAllNotams();
+
+        for (const Notam& notam : allNotams) {
+            // Check if NOTAM affects departure or arrival airport
+            if ((0 == strcmp(notam.location, flightPlan.departureAirport)) ||
+                (0 == strcmp(notam.location, flightPlan.arrivalAirport))) {
+                relevantNotams.push_back(&notam);
+                continue;
+            }
+
+            // Check if NOTAM affects any airspace in the route
+            for (const AirspaceInfo& routeSpace : flightPlan.routeAirspaces) {
+                if (isAirspaceAffected(routeSpace.identifier, notam.affectedAirspace.identifier)) {
+                    relevantNotams.push_back(&notam);
+                    break;
+                }
+            }
+        }
+
+        return relevantNotams;
+    }
+};
