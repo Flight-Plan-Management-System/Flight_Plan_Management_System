@@ -372,3 +372,626 @@ public:
         return relevantNotams;
     }
 };
+
+class FlightDataHandler {
+private:
+    NotamProcessor& notamProcessor_;
+    ConnectionManager& connectionManager_;
+
+    // Cached state for multi-packet handling
+    std::unordered_map<std::string, std::string> assembledMessages;
+    std::unordered_map<std::string, std::set<uint64_t>> receivedSequences;
+
+    std::vector<AirspaceInfo> getRouteAirspaces(const char* departure, const char* arrival) const {
+        std::vector<AirspaceInfo> airspaces;
+
+        // Toronto to New York route
+        if ((0 == strcmp(departure, "CYYZ")) && (0 == strcmp(arrival, "KJFK"))) {
+            const char* routePoints[] = { "CYYZ", "KBUF", "KJFK" };
+            for (const char* point : routePoints) {
+                AirspaceInfo space;
+                (void)SafeString::copy(space.identifier, sizeof(space.identifier), point);
+                space.center.latitude = 0.0;
+                space.center.longitude = 0.0;
+                space.radius = 15.0;
+                airspaces.push_back(space);
+            }
+        }
+        // Waterloo to Montreal route
+        else if ((0 == strcmp(departure, "CYKF")) && (0 == strcmp(arrival, "CYUL"))) {
+            const char* routePoints[] = { "CYKF", "CYOW", "CYUL" };
+            for (const char* point : routePoints) {
+                AirspaceInfo space;
+                (void)SafeString::copy(space.identifier, sizeof(space.identifier), point);
+                space.center.latitude = 0.0;
+                space.center.longitude = 0.0;
+                space.radius = 15.0;
+                airspaces.push_back(space);
+            }
+        }
+        // Generic fallback - just use departure and arrival
+        else {
+            AirspaceInfo depSpace;
+            (void)SafeString::copy(depSpace.identifier, sizeof(depSpace.identifier), departure);
+            depSpace.center.latitude = 0.0;
+            depSpace.center.longitude = 0.0;
+            depSpace.radius = 15.0;
+            airspaces.push_back(depSpace);
+
+            AirspaceInfo arrSpace;
+            (void)SafeString::copy(arrSpace.identifier, sizeof(arrSpace.identifier), arrival);
+            arrSpace.center.latitude = 0.0;
+            arrSpace.center.longitude = 0.0;
+            arrSpace.radius = 15.0;
+            airspaces.push_back(arrSpace);
+        }
+
+        return airspaces;
+    }
+
+    FlightPlan parseFlightPlan(const std::string& data) const {
+        FlightPlan plan;
+        std::memset(&plan, 0, sizeof(FlightPlan));
+
+        std::istringstream iss(data);
+        std::string line;
+
+        while (std::getline(iss, line)) {
+            if (line.find("FLIGHT_NUMBER=") == 0) {
+                (void)SafeString::copy(plan.flightId, sizeof(plan.flightId), line.substr(14).c_str());
+            }
+            else if (line.find("AIRCRAFT_REG=") == 0) {
+                (void)SafeString::copy(plan.aircraftReg, sizeof(plan.aircraftReg), line.substr(13).c_str());
+            }
+            else if (line.find("AIRCRAFT_TYPE=") == 0) {
+                (void)SafeString::copy(plan.aircraftType, sizeof(plan.aircraftType), line.substr(14).c_str());
+            }
+            else if (line.find("OPERATOR=") == 0) {
+                (void)SafeString::copy(plan.operator_, sizeof(plan.operator_), line.substr(9).c_str());
+            }
+            else if (line.find("DEP=") == 0) {
+                (void)SafeString::copy(plan.departureAirport, sizeof(plan.departureAirport), line.substr(4).c_str());
+            }
+            else if (line.find("ARR=") == 0) {
+                (void)SafeString::copy(plan.arrivalAirport, sizeof(plan.arrivalAirport), line.substr(4).c_str());
+            }
+            else if (line.find("ROUTE=") == 0) {
+                (void)SafeString::copy(plan.route, sizeof(plan.route), line.substr(6).c_str());
+            }
+            else if (line.find("CRUISE_ALT=") == 0) {
+                plan.cruiseAlt = std::stoi(line.substr(11));
+            }
+            else if (line.find("SPEED=") == 0) {
+                plan.speed = std::stoi(line.substr(6));
+            }
+            else if (line.find("EOBT=") == 0) {
+                (void)SafeString::copy(plan.etdTime, sizeof(plan.etdTime), line.substr(5).c_str());
+            }
+            else if (line.find("ETA=") == 0) {
+                (void)SafeString::copy(plan.etaTime, sizeof(plan.etaTime), line.substr(4).c_str());
+            }
+        }
+
+        // Get route airspaces
+        plan.routeAirspaces = getRouteAirspaces(plan.departureAirport, plan.arrivalAirport);
+
+        return plan;
+    }
+
+    FlightLog parseFlightLog(const std::string& data) const {
+        FlightLog log;
+        std::memset(&log, 0, sizeof(FlightLog));
+
+        std::istringstream iss(data);
+        std::string line;
+
+        while (std::getline(iss, line)) {
+            if (line.find("FLIGHT_NUMBER=") == 0) {
+                (void)SafeString::copy(log.flightId, sizeof(log.flightId), line.substr(14).c_str());
+            }
+            else if (line.find("TOTAL_FLIGHT_TIME=") == 0) {
+                (void)SafeString::copy(log.totalFlightTime, sizeof(log.totalFlightTime), line.substr(18).c_str());
+            }
+            else if (line.find("FUEL_ON_BOARD=") == 0) {
+                log.fuelOnBoard = std::stoi(line.substr(14));
+            }
+            else if (line.find("ESTIMATED_FUEL_BURN=") == 0) {
+                log.estimatedFuelBurn = std::stoi(line.substr(20));
+            }
+            else if (line.find("TOTAL_WEIGHT=") == 0) {
+                log.totalWeight = std::stoi(line.substr(13));
+            }
+            else if (line.find("PIC=") == 0) {
+                (void)SafeString::copy(log.picName, sizeof(log.picName), line.substr(4).c_str());
+            }
+            else if (line.find("REMARKS=") == 0) {
+                (void)SafeString::copy(log.remarks, sizeof(log.remarks), line.substr(8).c_str());
+            }
+            // Weather info parsing
+            else if (line.find("DEP_VISIBILITY=") == 0) {
+                (void)SafeString::copy(log.weatherInfo.depVisibility, sizeof(log.weatherInfo.depVisibility), line.substr(15).c_str());
+            }
+            // Add similar parsing for other weather fields...
+        }
+
+        return log;
+    }
+
+public:
+    explicit FlightDataHandler(NotamProcessor& processor, ConnectionManager& connManager)
+        : notamProcessor_(processor), connectionManager_(connManager) {
+    }
+
+    std::string processConnectionRequest(const std::string& clientData) {
+        // Parse connection request
+        ConnectionRequest request;
+        std::string clientId = request.parseFromData(clientData);
+
+        if (clientId.empty()) {
+            return "ERROR: Invalid connection request format";
+        }
+
+        // Check if we can accept connection
+        bool accepted = connectionManager_.canAcceptConnection();
+        if (accepted) {
+            connectionManager_.addClient(clientId);
+            std::cout << "Connection accepted for client: " << clientId
+                << " (Active clients: " << connectionManager_.getActiveClientCount() << ")" << std::endl;
+            return ConnectionRequest::createAcceptResponse();
+        }
+        else {
+            std::cout << "Connection rejected for client: " << clientId
+                << " (Maximum connections reached: " << connectionManager_.getActiveClientCount() << ")" << std::endl;
+            return ConnectionRequest::createRejectResponse();
+        }
+    }
+
+    std::string processFlightData(const std::string& clientData, const std::string& clientId) {
+        // First, parse the header
+        PacketHeaderParser::ParsedHeader header = PacketHeaderParser::parseHeader(clientData);
+
+        if (!header.isValid) {
+            std::cerr << "Invalid packet header for client " << clientId << std::endl;
+            return "ERROR: Invalid packet header";
+        }
+
+        // Find the payload (everything after END_HEADER)
+        size_t payloadStart = clientData.find("END_HEADER\n");
+        if (payloadStart == std::string::npos) {
+            std::cerr << "No payload found for client " << clientId << std::endl;
+            return "ERROR: No payload found";
+        }
+        payloadStart += 11; // Length of "END_HEADER\n"
+        std::string payload = clientData.substr(payloadStart);
+
+        // Debug print
+        std::cout << "Received Packet - Client: " << clientId
+            << ", Seq: " << header.sequenceNumber
+            << ", Payload Size: " << payload.length()
+            << ", Payload Type: "
+            << (payload.find("FLIGHT_PLAN") != std::string::npos ? "FLIGHT_PLAN" :
+                (payload.find("FLIGHT_LOG") != std::string::npos ? "FLIGHT_LOG" : "UNKNOWN"))
+            << std::endl;
+
+        // Validate payload size
+        if (payload.length() != header.payloadSize) {
+            std::cerr << "Payload size mismatch. Expected: " << header.payloadSize
+                << ", Actual: " << payload.length() << std::endl;
+            return "ERROR: Payload size mismatch";
+        }
+
+        // Track received sequences for this client
+        auto& clientSequences = receivedSequences[clientId];
+
+        // Check for duplicate sequence number
+        if (clientSequences.count(header.sequenceNumber) > 0) {
+            std::cerr << "Duplicate sequence number for client " << clientId
+                << ": " << header.sequenceNumber << std::endl;
+            return "ERROR: Duplicate sequence number";
+        }
+        clientSequences.insert(header.sequenceNumber);
+
+        // Assemble multi-packet message
+        assembledMessages[clientId] += payload;
+
+        // Detect if this is the final packet
+        if (clientSequences.size() >= 2) { // Assuming 2 packets for this example
+            std::string fullMessage = assembledMessages[clientId];
+
+            // Reset the assembled messages and sequences
+            assembledMessages.erase(clientId);
+            receivedSequences.erase(clientId);
+
+            // Debug print full message
+            std::cout << "Full Message Assembled for Client " << clientId << ":" << std::endl;
+            std::cout << fullMessage << std::endl;
+
+            // Process the full message
+            if (fullMessage.find("FLIGHT_PLAN") != std::string::npos) {
+                // Parse and store flight plan
+                FlightPlan flightPlan = parseFlightPlan(fullMessage);
+
+                // Get relevant NOTAMs
+                std::vector<const Notam*> relevantNotams = notamProcessor_.getRelevantNotams(flightPlan);
+
+                if (relevantNotams.empty()) {
+                    return "NO_NOTAMS_FOUND\n";
+                }
+
+                // Create response with relevant NOTAMs
+                std::ostringstream response;
+                response << "NOTAMS AFFECTING YOUR FLIGHT:\n";
+                for (const Notam* notam : relevantNotams) {
+                    response << "NOTAM: " << notam->identifier << " for " << notam->location;
+                    response << " - " << notam->description << "\n";
+                }
+
+                return response.str();
+            }
+        }
+
+        // Partial message or waiting for more
+        return "RECEIVED: Partial Message (Seq: " + std::to_string(header.sequenceNumber) + ")\n";
+    }
+};
+
+// Server implementation functions
+ServerStateMachine initializeWinsock() {
+    WSADATA wsaData;
+    int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
+    if (result != 0) {
+        std::cerr << "WSAStartup failed: " << result << std::endl;
+        return ServerStateMachine::CONNECTION_ERROR;
+    }
+    return ServerStateMachine::SUCCESS;
+}
+
+ServerStateMachine createServerSocket(SOCKET& serverSocket) {
+    serverSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (serverSocket == INVALID_SOCKET) {
+        std::cerr << "Failed to create socket: " << WSAGetLastError() << std::endl;
+        WSACleanup();
+        return ServerStateMachine::CONNECTION_ERROR;
+    }
+
+    // Set socket options to allow address reuse
+    BOOL opt = TRUE;
+    if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char*>(&opt), sizeof(opt)) == SOCKET_ERROR) {
+        std::cerr << "Failed to set socket options: " << WSAGetLastError() << std::endl;
+        closesocket(serverSocket);
+        WSACleanup();
+        return ServerStateMachine::CONNECTION_ERROR;
+    }
+
+    return ServerStateMachine::SUCCESS;
+}
+
+ServerStateMachine bindSocketToPort(SOCKET serverSocket, uint16_t port) {
+    struct sockaddr_in serverAddr;
+    memset(&serverAddr, 0, sizeof(serverAddr));
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_addr.s_addr = INADDR_ANY;
+    serverAddr.sin_port = htons(port);
+
+    if (bind(serverSocket, reinterpret_cast<SOCKADDR*>(&serverAddr), sizeof(serverAddr)) == SOCKET_ERROR) {
+        std::cerr << "Failed to bind socket to port " << port << ": " << WSAGetLastError() << std::endl;
+        closesocket(serverSocket);
+        WSACleanup();
+        return ServerStateMachine::CONNECTION_ERROR;
+    }
+
+    return ServerStateMachine::SUCCESS;
+}
+
+ServerStateMachine startListening(SOCKET serverSocket) {
+    if (listen(serverSocket, 5) == SOCKET_ERROR) {
+        std::cerr << "Failed to listen on socket: " << WSAGetLastError() << std::endl;
+        closesocket(serverSocket);
+        WSACleanup();
+        return ServerStateMachine::CONNECTION_ERROR;
+    }
+
+    return ServerStateMachine::SUCCESS;
+}
+
+void cleanupWinsock(SOCKET serverSocket) {
+    if (serverSocket != INVALID_SOCKET) {
+        closesocket(serverSocket);
+    }
+    WSACleanup();
+}
+
+void handleClientConnection(SOCKET clientSocket, FlightDataHandler& dataHandler, ConnectionManager& connectionManager) {
+    std::string clientId; // Store the client ID for the entire connection
+    bool isConnectionEstablished = false;
+    const uint32_t BUFFER_SIZE = 4096U;
+
+    while (true) {
+        std::array<char, BUFFER_SIZE> buffer;
+        int bytesRead = recv(clientSocket, buffer.data(), buffer.size() - 1, 0);
+
+        if (bytesRead <= 0) {
+            // Connection closed or error
+            break;
+        }
+
+        // Null-terminate the received data
+        buffer[static_cast<size_t>(bytesRead)] = '\0';
+        std::string fullRequest(buffer.data());
+        std::string response;
+
+        // First, parse the header
+        PacketHeaderParser::ParsedHeader header = PacketHeaderParser::parseHeader(fullRequest);
+
+        if (!header.isValid) {
+            response = "ERROR: Invalid packet header";
+            send(clientSocket, response.c_str(), static_cast<int>(response.length()), 0);
+            break;
+        }
+
+        // Find the actual payload (after END_HEADER)
+        size_t payloadStart = fullRequest.find("END_HEADER\n");
+        if (payloadStart == std::string::npos) {
+            response = "ERROR: Invalid packet format - no END_HEADER found";
+            send(clientSocket, response.c_str(), static_cast<int>(response.length()), 0);
+            break;
+        }
+        payloadStart += 11; // Length of "END_HEADER\n"
+        std::string payload = fullRequest.substr(payloadStart);
+
+        // Verify payload size matches header
+        if (payload.length() != header.payloadSize) {
+            response = "ERROR: Payload size mismatch. Expected " +
+                std::to_string(header.payloadSize) +
+                ", got " + std::to_string(payload.length());
+            send(clientSocket, response.c_str(), static_cast<int>(response.length()), 0);
+            break;
+        }
+
+        // Process different types of packets
+        if (!isConnectionEstablished) {
+            // Handle connection request
+            if (payload.find("REQUEST_CONNECTION") != std::string::npos) {
+                ConnectionRequest request;
+                clientId = request.parseFromData(payload);
+
+                if (clientId.empty()) {
+                    response = "ERROR: Invalid connection request format";
+                    send(clientSocket, response.c_str(), static_cast<int>(response.length()), 0);
+                    break;
+                }
+
+                // Check if we can accept connection
+                bool accepted = connectionManager.canAcceptConnection();
+                if (accepted) {
+                    connectionManager.addClient(clientId);
+                    std::cout << "Connection accepted for client: " << clientId
+                        << " (Active clients: " << connectionManager.getActiveClientCount() << ")" << std::endl;
+                    response = ConnectionRequest::createAcceptResponse();
+                    isConnectionEstablished = true;
+                }
+                else {
+                    std::cout << "Connection rejected for client: " << clientId
+                        << " (Maximum connections reached: " << connectionManager.getActiveClientCount() << ")" << std::endl;
+                    response = ConnectionRequest::createRejectResponse();
+                    break;
+                }
+
+                // Send the response back to the client
+                send(clientSocket, response.c_str(), static_cast<int>(response.length()), 0);
+
+                // Log the transaction
+                std::cout << "\n=== Client Request ===\n" << fullRequest << std::endl;
+                std::cout << "=== Server Response ===\n" << response << std::endl;
+            }
+            else {
+                response = "ERROR: Connection request required first";
+                send(clientSocket, response.c_str(), static_cast<int>(response.length()), 0);
+                break;
+            }
+        }
+        else {
+            // Process flight data after connection is established
+            try {
+                response = dataHandler.processFlightData(fullRequest, clientId);
+
+                // Only send response if it's not a partial message
+                if (response.find("Partial Message") == std::string::npos) {
+                    send(clientSocket, response.c_str(), static_cast<int>(response.length()), 0);
+
+                    // Break the loop if we've processed the full flight data
+                    if (response.find("NOTAMS AFFECTING YOUR FLIGHT") != std::string::npos) {
+                        break;
+                    }
+                }
+            }
+            catch (const std::exception& e) {
+                response = "ERROR: Processing flight data failed - " + std::string(e.what());
+                send(clientSocket, response.c_str(), static_cast<int>(response.length()), 0);
+                break;
+            }
+        }
+    }
+
+    // Close the client socket
+    closesocket(clientSocket);
+
+    // Remove the client from connection manager
+    if (!clientId.empty()) {
+        connectionManager.removeClient(clientId);
+    }
+}
+
+class TcpServer {
+private:
+    SOCKET serverSocket_;
+    FlightDataHandler& dataHandler_;
+    ConnectionManager& connectionManager_;
+    bool isRunning_;
+    static const uint32_t BUFFER_SIZE = 4096U;
+
+public:
+    explicit TcpServer(FlightDataHandler& handler, ConnectionManager& connManager) :
+        serverSocket_(INVALID_SOCKET),
+        dataHandler_(handler),
+        connectionManager_(connManager),
+        isRunning_(false) {
+        // No initialization needed
+    }
+
+    ServerStateMachine start(uint16_t port) {
+        // Initialize Winsock
+        WSADATA wsaData;
+        int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
+        if (result != 0) {
+            std::cerr << "WSAStartup failed: " << result << std::endl;
+            return ServerStateMachine::CONNECTION_ERROR;
+        }
+
+        // Create the server socket
+        serverSocket_ = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+        if (serverSocket_ == INVALID_SOCKET) {
+            std::cerr << "Failed to create socket: " << WSAGetLastError() << std::endl;
+            WSACleanup();
+            return ServerStateMachine::CONNECTION_ERROR;
+        }
+
+        // Set socket options to allow address reuse
+        BOOL opt = TRUE;
+        if (setsockopt(serverSocket_, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char*>(&opt), sizeof(opt)) == SOCKET_ERROR) {
+            std::cerr << "Failed to set socket options: " << WSAGetLastError() << std::endl;
+            closesocket(serverSocket_);
+            WSACleanup();
+            return ServerStateMachine::CONNECTION_ERROR;
+        }
+
+        // Bind the socket to the specified port
+        struct sockaddr_in serverAddr;
+        memset(&serverAddr, 0, sizeof(serverAddr));
+        serverAddr.sin_family = AF_INET;
+        serverAddr.sin_addr.s_addr = INADDR_ANY;
+        serverAddr.sin_port = htons(port);
+
+        if (bind(serverSocket_, reinterpret_cast<SOCKADDR*>(&serverAddr), sizeof(serverAddr)) == SOCKET_ERROR) {
+            std::cerr << "Failed to bind socket to port " << port << ": " << WSAGetLastError() << std::endl;
+            closesocket(serverSocket_);
+            WSACleanup();
+            return ServerStateMachine::CONNECTION_ERROR;
+        }
+
+        // Start listening for connections
+        if (listen(serverSocket_, 5) == SOCKET_ERROR) {
+            std::cerr << "Failed to listen on socket: " << WSAGetLastError() << std::endl;
+            closesocket(serverSocket_);
+            WSACleanup();
+            return ServerStateMachine::CONNECTION_ERROR;
+        }
+
+        isRunning_ = true;
+        std::cout << "NOTAM Server started on port " << port << std::endl;
+        std::cout << "Maximum concurrent connections: " << ConnectionManager::MAX_CONNECTIONS << std::endl;
+
+        return ServerStateMachine::SUCCESS;
+    }
+
+    void run(void) {
+        if (!isRunning_) {
+            std::cerr << "Server not started" << std::endl;
+            return;
+        }
+
+        std::cout << "Waiting for connections..." << std::endl;
+
+        while (isRunning_) {
+            // Accept a new client connection
+            struct sockaddr_in clientAddr;
+            int clientAddrLen = sizeof(clientAddr);
+
+            SOCKET clientSocket = accept(serverSocket_, reinterpret_cast<SOCKADDR*>(&clientAddr), &clientAddrLen);
+            if (clientSocket == INVALID_SOCKET) {
+                std::cerr << "Failed to accept connection: " << WSAGetLastError() << std::endl;
+                continue;
+            }
+
+            // Get client information
+            char clientIP[INET_ADDRSTRLEN];
+            inet_ntop(AF_INET, &(clientAddr.sin_addr), clientIP, INET_ADDRSTRLEN);
+            std::cout << "Client connected: " << clientIP << std::endl;
+
+            // Handle the client in the current thread
+            handleClientConnection(clientSocket, dataHandler_, connectionManager_);
+        }
+    }
+
+    void stop(void) {
+        isRunning_ = false;
+        if (serverSocket_ != INVALID_SOCKET) {
+            closesocket(serverSocket_);
+            serverSocket_ = INVALID_SOCKET;
+            WSACleanup();
+        }
+        std::cout << "Server stopped" << std::endl;
+    }
+
+    ~TcpServer(void) {
+        if (isRunning_) {
+            stop();
+        }
+    }
+};
+
+// Main application
+int32_t main(int argc, char* argv[]) {
+    // Default parameters
+    std::string notamFile = "notam_database.txt";
+    uint16_t port = 8081;
+
+    // Parse command line arguments
+    for (int i = 1; i < argc; i += 2) {
+        if (i + 1 >= argc) {
+            break;
+        }
+
+        if (strcmp(argv[i], "-f") == 0) {
+            notamFile = argv[i + 1];
+        }
+        else if (strcmp(argv[i], "-p") == 0) {
+            port = static_cast<uint16_t>(atoi(argv[i + 1]));
+        }
+    }
+
+    std::cout << "NOTAM Server\n";
+    std::cout << "============\n\n";
+
+    // Initialize NOTAM database
+    NotamDatabase notamDb;
+    if (!notamDb.loadFromFile(notamFile)) {
+        std::cerr << "Failed to load NOTAM database from: " << notamFile << std::endl;
+        std::cerr << "Creating an empty database...\n";
+    }
+    else {
+        std::cout << "Loaded NOTAM database from: " << notamFile << std::endl;
+    }
+
+    // Initialize connection manager
+    ConnectionManager connectionManager;
+
+    // Initialize NOTAM processor
+    NotamProcessor processor(notamDb);
+
+    // Initialize flight data handler
+    FlightDataHandler handler(processor, connectionManager);
+
+    // Start the TCP server
+    TcpServer server(handler, connectionManager);
+    ServerStateMachine startResult = server.start(port);
+
+    if (startResult != ServerStateMachine::SUCCESS) {
+        return static_cast<int32_t>(startResult);
+    }
+
+    // Run the server until stopped
+    server.run();
+
+    return 0;
+}
