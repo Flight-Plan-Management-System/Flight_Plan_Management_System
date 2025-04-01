@@ -588,3 +588,968 @@ NOTAM: D0056/25 for CYOW - VOR/DME OW U/S
 
 ----- LOG SESSION ENDED -----
 
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-31 18:46:08
+=================================================
+[18:46:08] NotamClient initialized
+[18:46:08] Winsock initialized successfully
+[18:46:08] Generated client ID: F3749
+[18:46:17] Attempting to connect to server at 127.0.0.1:8081
+[18:46:17] Connected to server successfully
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-31 19:03:30
+=================================================
+[19:03:30] NotamClient initialized
+[19:03:30] Winsock initialized successfully
+[19:03:30] Generated client ID: F213
+[19:03:41] Attempting to connect to server at 127.0.0.1:8081
+[19:03:41] Connected to server successfully
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-31 19:04:58
+=================================================
+[19:04:58] NotamClient initialized
+[19:04:58] Winsock initialized successfully
+[19:04:58] Generated client ID: F2982
+[19:05:03] Attempting to connect to server at 127.0.0.1:8081
+[19:05:03] Connected to server successfully
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-31 19:06:20
+=================================================
+[19:06:20] NotamClient initialized
+[19:06:20] Winsock initialized successfully
+[19:06:20] Generated client ID: F229
+[19:06:29] Attempting to connect to server at 127.0.0.1:8081
+[19:06:29] Connected to server successfully
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-31 19:51:12
+=================================================
+[19:51:12] NotamClient initialized
+[19:51:12] Winsock initialized successfully
+[19:51:12] Generated client ID: F892
+[19:51:22] Attempting to connect to server at 127.0.0.1:8081
+[19:51:22] Connected to server successfully
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-31 19:52:51
+=================================================
+[19:52:51] NotamClient initialized
+[19:52:51] Winsock initialized successfully
+[19:52:51] Generated client ID: F1460
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-31 19:53:16
+=================================================
+[19:53:16] NotamClient initialized
+[19:53:16] Winsock initialized successfully
+[19:53:16] Generated client ID: F4850
+[19:53:27] Attempting to connect to server at 127.0.0.1:8081
+[19:53:27] Connected to server successfully
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-31 19:54:12
+=================================================
+[19:54:12] NotamClient initialized
+[19:54:12] Winsock initialized successfully
+[19:54:12] Generated client ID: F4933
+[19:54:19] Attempting to connect to server at 127.0.0.1:8081
+[19:54:19] Connected to server successfully
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-31 19:55:40
+=================================================
+[19:55:40] NotamClient initialized
+[19:55:40] Winsock initialized successfully
+[19:55:40] Generated client ID: F3870
+[19:55:44] Attempting to connect to server at 127.0.0.1:8081
+[19:55:44] Connected to server successfully
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-31 20:04:59
+=================================================
+[20:04:59] NotamClient initialized
+[20:04:59] Winsock initialized successfully
+[20:04:59] Generated client ID: F1251
+[20:05:03] Attempting to connect to server at 127.0.0.1:8081
+[20:05:03] Connected to server successfully
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-31 20:05:24
+=================================================
+[20:05:24] NotamClient initialized
+[20:05:24] Winsock initialized successfully
+[20:05:24] Generated client ID: F1773
+[20:05:42] Attempting to connect to server at 127.0.0.1:8081
+[20:05:42] Connected to server successfully
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-31 20:08:05
+=================================================
+[20:08:05] NotamClient initialized
+[20:08:05] Winsock initialized successfully
+[20:08:05] Generated client ID: F4097
+[20:08:28] Attempting to connect to server at 127.0.0.1:8081
+[20:08:28] Connected to server successfully
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-31 20:09:20
+=================================================
+[20:09:20] NotamClient initialized
+[20:09:20] Winsock initialized successfully
+[20:09:20] Generated client ID: F4855
+[20:09:35] Attempting to connect to server at 127.0.0.1:8081
+[20:09:35] Connected to server successfully
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-31 20:10:04
+=================================================
+[20:10:04] NotamClient initialized
+[20:10:04] Winsock initialized successfully
+[20:10:04] Generated client ID: F1810
+[20:10:19] Attempting to connect to server at 127.0.0.1:8081
+[20:10:19] Connected to server successfully
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-31 20:17:14
+=================================================
+[20:17:14] NotamClient initialized
+[20:17:14] Winsock initialized successfully
+[20:17:14] Generated client ID: F1546
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-31 20:17:30
+=================================================
+[20:17:30] NotamClient initialized
+[20:17:30] Winsock initialized successfully
+[20:17:30] Generated client ID: F1185
+[20:17:32] Attempting to connect to server at 127.0.0.1:8081
+[20:17:32] Connected to server successfully
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-31 20:18:44
+=================================================
+[20:18:44] NotamClient initialized
+[20:18:44] Winsock initialized successfully
+[20:18:44] Generated client ID: F2991
+[20:18:46] Attempting to connect to server at 127.0.0.1:8081
+[20:18:46] Connected to server successfully
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-31 20:23:56
+=================================================
+[20:24:13] NotamClient initialized
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-31 20:24:24
+=================================================
+[20:24:24] NotamClient initialized
+[20:24:24] Winsock initialized successfully
+[20:24:24] Generated client ID: F2875
+[20:24:26] Attempting to connect to server at 127.0.0.1:8081
+[20:24:26] Connected to server successfully
+[20:24:41] Sending connection request for client ID: F2875
+
+----- SENT PACKET [20:24:41] -----
+Description: Connection Request
+HEADER
+SEQ_NUM=1
+TIMESTAMP=2025-03-31T20:24:37Z
+PAYLOAD_SIZE=35
+END_HEADER
+REQUEST_CONNECTION
+CLIENT_ID=F2875
+
+----- END OF SENT PACKET -----
+[20:24:41] Waiting to receive response from server
+
+----- RECEIVED PACKET [20:24:41] -----
+Description: Server Response (20 bytes)
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+
+----- RECEIVED PACKET [20:24:41] -----
+Description: Connection Response
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+[20:24:41] Connection request approved by server
+[20:25:11] Sending extended flight information for flight: F2875 from CYYZ to KJFK
+
+----- SENT PACKET [20:25:36] -----
+Description: Flight Plan
+HEADER
+SEQ_NUM=2
+TIMESTAMP=2025-03-31T20:25:36Z
+PAYLOAD_SIZE=159
+END_HEADER
+FLIGHT_PLAN
+FLIGHT_NUMBER=F2875
+AIRCRAFT_REG=1111
+AIRCRAFT_TYPE=1111
+OPERATOR=1
+DEP=CYYZ
+ARR=KJFK
+LAYOVER=CYUL
+ROUTE=1
+CRUISE_ALT=1
+SPEED=1
+EOBT=1
+ETD=1
+ETA=1
+
+----- END OF SENT PACKET -----
+
+----- SENT PACKET [20:25:47] -----
+Description: Flight Log
+HEADER
+SEQ_NUM=3
+TIMESTAMP=2025-03-31T20:25:47Z
+PAYLOAD_SIZE=120
+END_HEADER
+FLIGHT_LOG
+FLIGHT_NUMBER=F2875
+TOTAL_FLIGHT_TIME=1
+FUEL_ON_BOARD=1
+ESTIMATED_FUEL_BURN=1
+TOTAL_WEIGHT=1
+PIC=1
+REMARKS=1
+
+----- END OF SENT PACKET -----
+[20:25:47] Flight information sent successfully
+[20:25:49] Waiting to receive response from server
+
+----- RECEIVED PACKET [20:25:49] -----
+Description: Server Response (275 bytes)
+NOTAMS AFFECTING YOUR FLIGHT:
+NOTAM: A0245/25 for CYYZ - RWY 05/23 CLSD DUE SNOW REMOVAL
+NOTAM: B0178/25 for KBUF - TEMPO FLIGHT RESTRICTIONS DUE AIRSHOW PRACTICE
+NOTAM: E0211/25 for KJFK - CRANE OPERATIONS EAST OF RWY 13L/31R
+WEATHER WARNING:
+High wind speed detected: 28°C
+
+----- END OF RECEIVED PACKET -----
+[20:26:47] Disconnecting from server
+[20:26:47] Disconnected from server
+[20:26:47] Winsock cleaned up
+
+----- LOG SESSION ENDED -----
+
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-31 20:31:55
+=================================================
+[20:31:55] NotamClient initialized
+[20:31:55] Winsock initialized successfully
+[20:31:55] Generated client ID: F1873
+[20:32:01] Attempting to connect to server at 127.0.0.1:8081
+[20:32:01] Connected to server successfully
+[20:32:02] Sending connection request for client ID: F1873
+
+----- SENT PACKET [20:32:02] -----
+Description: Connection Request
+HEADER
+SEQ_NUM=1
+TIMESTAMP=2025-03-31T20:32:02Z
+PAYLOAD_SIZE=35
+END_HEADER
+REQUEST_CONNECTION
+CLIENT_ID=F1873
+
+----- END OF SENT PACKET -----
+[20:32:02] Waiting to receive response from server
+
+----- RECEIVED PACKET [20:32:02] -----
+Description: Server Response (20 bytes)
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+
+----- RECEIVED PACKET [20:32:02] -----
+Description: Connection Response
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+[20:32:02] Connection request approved by server
+[20:32:04] Sending extended flight information for flight: F1873 from CYYZ to KJFK
+
+----- SENT PACKET [20:32:09] -----
+Description: Flight Plan
+HEADER
+SEQ_NUM=2
+TIMESTAMP=2025-03-31T20:32:09Z
+PAYLOAD_SIZE=153
+END_HEADER
+FLIGHT_PLAN
+FLIGHT_NUMBER=F1873
+AIRCRAFT_REG=1
+AIRCRAFT_TYPE=1
+OPERATOR=1
+DEP=CYYZ
+ARR=KJFK
+LAYOVER=CYUL
+ROUTE=1
+CRUISE_ALT=1
+SPEED=1
+EOBT=1
+ETD=1
+ETA=1
+
+----- END OF SENT PACKET -----
+
+----- SENT PACKET [20:33:19] -----
+Description: Flight Log
+HEADER
+SEQ_NUM=3
+TIMESTAMP=2025-03-31T20:33:19Z
+PAYLOAD_SIZE=120
+END_HEADER
+FLIGHT_LOG
+FLIGHT_NUMBER=F1873
+TOTAL_FLIGHT_TIME=1
+FUEL_ON_BOARD=1
+ESTIMATED_FUEL_BURN=1
+TOTAL_WEIGHT=1
+PIC=1
+REMARKS=1
+
+----- END OF SENT PACKET -----
+[20:33:19] Flight information sent successfully
+[20:33:21] Waiting to receive response from server
+
+----- RECEIVED PACKET [20:33:21] -----
+Description: Server Response (275 bytes)
+NOTAMS AFFECTING YOUR FLIGHT:
+NOTAM: A0245/25 for CYYZ - RWY 05/23 CLSD DUE SNOW REMOVAL
+NOTAM: B0178/25 for KBUF - TEMPO FLIGHT RESTRICTIONS DUE AIRSHOW PRACTICE
+NOTAM: E0211/25 for KJFK - CRANE OPERATIONS EAST OF RWY 13L/31R
+WEATHER WARNING:
+High wind speed detected: 28°C
+
+----- END OF RECEIVED PACKET -----
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-31 20:52:40
+=================================================
+[20:52:40] NotamClient initialized
+[20:52:40] Winsock initialized successfully
+[20:52:40] Generated client ID: F3621
+[20:52:43] Attempting to connect to server at 127.0.0.1:8081
+[20:52:43] Connected to server successfully
+[20:52:44] Sending connection request for client ID: F3621
+
+----- SENT PACKET [20:52:44] -----
+Description: Connection Request
+HEADER
+SEQ_NUM=1
+TIMESTAMP=2025-03-31T20:52:44Z
+PAYLOAD_SIZE=35
+END_HEADER
+REQUEST_CONNECTION
+CLIENT_ID=F3621
+
+----- END OF SENT PACKET -----
+[20:52:44] Waiting to receive response from server
+
+----- RECEIVED PACKET [20:52:44] -----
+Description: Server Response (20 bytes)
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+
+----- RECEIVED PACKET [20:52:44] -----
+Description: Connection Response
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+[20:52:44] Connection request approved by server
+[20:52:46] Sending extended flight information for flight: F3621 from CYYZ to KJFK
+
+----- SENT PACKET [20:52:54] -----
+Description: Flight Plan
+HEADER
+SEQ_NUM=2
+TIMESTAMP=2025-03-31T20:52:54Z
+PAYLOAD_SIZE=153
+END_HEADER
+FLIGHT_PLAN
+FLIGHT_NUMBER=F3621
+AIRCRAFT_REG=1
+AIRCRAFT_TYPE=1
+OPERATOR=1
+DEP=CYYZ
+ARR=KJFK
+LAYOVER=CYUL
+ROUTE=1
+CRUISE_ALT=1
+SPEED=1
+EOBT=1
+ETD=1
+ETA=1
+
+----- END OF SENT PACKET -----
+
+----- SENT PACKET [20:53:11] -----
+Description: Flight Log
+HEADER
+SEQ_NUM=3
+TIMESTAMP=2025-03-31T20:53:11Z
+PAYLOAD_SIZE=120
+END_HEADER
+FLIGHT_LOG
+FLIGHT_NUMBER=F3621
+TOTAL_FLIGHT_TIME=1
+FUEL_ON_BOARD=1
+ESTIMATED_FUEL_BURN=1
+TOTAL_WEIGHT=1
+PIC=1
+REMARKS=1
+
+----- END OF SENT PACKET -----
+[20:53:11] Flight information sent successfully
+[20:53:13] Waiting to receive response from server
+
+----- RECEIVED PACKET [20:53:13] -----
+Description: Server Response (275 bytes)
+NOTAMS AFFECTING YOUR FLIGHT:
+NOTAM: A0245/25 for CYYZ - RWY 05/23 CLSD DUE SNOW REMOVAL
+NOTAM: B0178/25 for KBUF - TEMPO FLIGHT RESTRICTIONS DUE AIRSHOW PRACTICE
+NOTAM: E0211/25 for KJFK - CRANE OPERATIONS EAST OF RWY 13L/31R
+WEATHER WARNING:
+High wind speed detected: 28°C
+
+----- END OF RECEIVED PACKET -----
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-31 20:54:21
+=================================================
+[20:54:21] NotamClient initialized
+[20:54:21] Winsock initialized successfully
+[20:54:21] Generated client ID: F4707
+[20:54:23] Attempting to connect to server at 127.0.0.1:8081
+[20:54:23] Connected to server successfully
+[20:54:24] Sending connection request for client ID: F4707
+
+----- SENT PACKET [20:54:24] -----
+Description: Connection Request
+HEADER
+SEQ_NUM=1
+TIMESTAMP=2025-03-31T20:54:24Z
+PAYLOAD_SIZE=35
+END_HEADER
+REQUEST_CONNECTION
+CLIENT_ID=F4707
+
+----- END OF SENT PACKET -----
+[20:54:24] Waiting to receive response from server
+
+----- RECEIVED PACKET [20:54:24] -----
+Description: Server Response (20 bytes)
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+
+----- RECEIVED PACKET [20:54:24] -----
+Description: Connection Response
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+[20:54:24] Connection request approved by server
+[20:54:25] Sending extended flight information for flight: F4707 from CYYZ to KJFK
+
+----- SENT PACKET [20:54:29] -----
+Description: Flight Plan
+HEADER
+SEQ_NUM=2
+TIMESTAMP=2025-03-31T20:54:29Z
+PAYLOAD_SIZE=153
+END_HEADER
+FLIGHT_PLAN
+FLIGHT_NUMBER=F4707
+AIRCRAFT_REG=1
+AIRCRAFT_TYPE=1
+OPERATOR=1
+DEP=CYYZ
+ARR=KJFK
+LAYOVER=CYUL
+ROUTE=1
+CRUISE_ALT=1
+SPEED=1
+EOBT=1
+ETD=1
+ETA=1
+
+----- END OF SENT PACKET -----
+
+----- SENT PACKET [20:54:34] -----
+Description: Flight Log
+HEADER
+SEQ_NUM=3
+TIMESTAMP=2025-03-31T20:54:34Z
+PAYLOAD_SIZE=120
+END_HEADER
+FLIGHT_LOG
+FLIGHT_NUMBER=F4707
+TOTAL_FLIGHT_TIME=1
+FUEL_ON_BOARD=1
+ESTIMATED_FUEL_BURN=1
+TOTAL_WEIGHT=1
+PIC=1
+REMARKS=1
+
+----- END OF SENT PACKET -----
+[20:54:34] Flight information sent successfully
+[20:54:36] Waiting to receive response from server
+
+----- RECEIVED PACKET [20:54:36] -----
+Description: Server Response (275 bytes)
+NOTAMS AFFECTING YOUR FLIGHT:
+NOTAM: A0245/25 for CYYZ - RWY 05/23 CLSD DUE SNOW REMOVAL
+NOTAM: B0178/25 for KBUF - TEMPO FLIGHT RESTRICTIONS DUE AIRSHOW PRACTICE
+NOTAM: E0211/25 for KJFK - CRANE OPERATIONS EAST OF RWY 13L/31R
+WEATHER WARNING:
+High wind speed detected: 28°C
+
+----- END OF RECEIVED PACKET -----
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-31 20:57:48
+=================================================
+[20:57:48] NotamClient initialized
+[20:57:48] Winsock initialized successfully
+[20:57:48] Generated client ID: F3246
+[20:57:53] Attempting to connect to server at 127.0.0.1:8081
+[20:57:53] Connected to server successfully
+[20:57:55] Sending connection request for client ID: F3246
+
+----- SENT PACKET [20:57:55] -----
+Description: Connection Request
+HEADER
+SEQ_NUM=1
+TIMESTAMP=2025-03-31T20:57:55Z
+PAYLOAD_SIZE=35
+END_HEADER
+REQUEST_CONNECTION
+CLIENT_ID=F3246
+
+----- END OF SENT PACKET -----
+[20:57:55] Waiting to receive response from server
+
+----- RECEIVED PACKET [20:57:55] -----
+Description: Server Response (20 bytes)
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+
+----- RECEIVED PACKET [20:57:55] -----
+Description: Connection Response
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+[20:57:55] Connection request approved by server
+[20:57:56] Sending extended flight information for flight: F3246 from CYYZ to KJFK
+
+----- SENT PACKET [20:58:01] -----
+Description: Flight Plan
+HEADER
+SEQ_NUM=2
+TIMESTAMP=2025-03-31T20:58:01Z
+PAYLOAD_SIZE=153
+END_HEADER
+FLIGHT_PLAN
+FLIGHT_NUMBER=F3246
+AIRCRAFT_REG=1
+AIRCRAFT_TYPE=1
+OPERATOR=1
+DEP=CYYZ
+ARR=KJFK
+LAYOVER=CYUL
+ROUTE=1
+CRUISE_ALT=1
+SPEED=1
+EOBT=1
+ETD=1
+ETA=1
+
+----- END OF SENT PACKET -----
+
+----- SENT PACKET [20:58:17] -----
+Description: Flight Log
+HEADER
+SEQ_NUM=3
+TIMESTAMP=2025-03-31T20:58:17Z
+PAYLOAD_SIZE=120
+END_HEADER
+FLIGHT_LOG
+FLIGHT_NUMBER=F3246
+TOTAL_FLIGHT_TIME=1
+FUEL_ON_BOARD=1
+ESTIMATED_FUEL_BURN=1
+TOTAL_WEIGHT=1
+PIC=1
+REMARKS=1
+
+----- END OF SENT PACKET -----
+[20:58:17] Flight information sent successfully
+[20:58:19] Waiting to receive response from server
+
+----- RECEIVED PACKET [20:58:19] -----
+Description: Server Response (275 bytes)
+NOTAMS AFFECTING YOUR FLIGHT:
+NOTAM: A0245/25 for CYYZ - RWY 05/23 CLSD DUE SNOW REMOVAL
+NOTAM: B0178/25 for KBUF - TEMPO FLIGHT RESTRICTIONS DUE AIRSHOW PRACTICE
+NOTAM: E0211/25 for KJFK - CRANE OPERATIONS EAST OF RWY 13L/31R
+WEATHER WARNING:
+High wind speed detected: 28°C
+
+----- END OF RECEIVED PACKET -----
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-31 21:04:00
+=================================================
+[21:04:00] NotamClient initialized
+[21:04:00] Winsock initialized successfully
+[21:04:00] Generated client ID: F4343
+[21:04:03] Attempting to connect to server at 127.0.0.1:8081
+[21:04:03] Connected to server successfully
+[21:04:04] Sending connection request for client ID: F4343
+
+----- SENT PACKET [21:04:04] -----
+Description: Connection Request
+HEADER
+SEQ_NUM=1
+TIMESTAMP=2025-03-31T21:04:04Z
+PAYLOAD_SIZE=35
+END_HEADER
+REQUEST_CONNECTION
+CLIENT_ID=F4343
+
+----- END OF SENT PACKET -----
+[21:04:04] Waiting to receive response from server
+
+----- RECEIVED PACKET [21:04:04] -----
+Description: Server Response (20 bytes)
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+
+----- RECEIVED PACKET [21:04:04] -----
+Description: Connection Response
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+[21:04:04] Connection request approved by server
+[21:04:05] Sending extended flight information for flight: F4343 from CYYZ to KJFK
+
+----- SENT PACKET [21:04:11] -----
+Description: Flight Plan
+HEADER
+SEQ_NUM=2
+TIMESTAMP=2025-03-31T21:04:11Z
+PAYLOAD_SIZE=153
+END_HEADER
+FLIGHT_PLAN
+FLIGHT_NUMBER=F4343
+AIRCRAFT_REG=1
+AIRCRAFT_TYPE=1
+OPERATOR=1
+DEP=CYYZ
+ARR=KJFK
+LAYOVER=CYUL
+ROUTE=1
+CRUISE_ALT=1
+SPEED=1
+EOBT=1
+ETD=1
+ETA=1
+
+----- END OF SENT PACKET -----
+
+----- SENT PACKET [21:04:16] -----
+Description: Flight Log
+HEADER
+SEQ_NUM=3
+TIMESTAMP=2025-03-31T21:04:16Z
+PAYLOAD_SIZE=120
+END_HEADER
+FLIGHT_LOG
+FLIGHT_NUMBER=F4343
+TOTAL_FLIGHT_TIME=1
+FUEL_ON_BOARD=1
+ESTIMATED_FUEL_BURN=1
+TOTAL_WEIGHT=1
+PIC=1
+REMARKS=1
+
+----- END OF SENT PACKET -----
+[21:04:16] Flight information sent successfully
+[21:04:18] Waiting to receive response from server
+
+----- RECEIVED PACKET [21:04:18] -----
+Description: Server Response (277 bytes)
+NOTAMS AFFECTING YOUR FLIGHT:
+NOTAM: A0245/25 for CYYZ - RWY 05/23 CLSD DUE SNOW REMOVAL
+NOTAM: B0178/25 for KBUF - TEMPO FLIGHT RESTRICTIONS DUE AIRSHOW PRACTICE
+NOTAM: E0211/25 for KJFK - CRANE OPERATIONS EAST OF RWY 13L/31R
+WEATHER WARNING:
+High wind speed detected: 28km/h
+
+----- END OF RECEIVED PACKET -----
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-31 21:05:19
+=================================================
+[21:05:19] NotamClient initialized
+[21:05:19] Winsock initialized successfully
+[21:05:19] Generated client ID: F1848
+[21:05:26] Attempting to connect to server at 127.0.0.1:8081
+[21:05:26] Connected to server successfully
+[21:05:27] Sending connection request for client ID: F1848
+
+----- SENT PACKET [21:05:27] -----
+Description: Connection Request
+HEADER
+SEQ_NUM=1
+TIMESTAMP=2025-03-31T21:05:27Z
+PAYLOAD_SIZE=35
+END_HEADER
+REQUEST_CONNECTION
+CLIENT_ID=F1848
+
+----- END OF SENT PACKET -----
+[21:05:27] Waiting to receive response from server
+
+----- RECEIVED PACKET [21:05:27] -----
+Description: Server Response (20 bytes)
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+
+----- RECEIVED PACKET [21:05:27] -----
+Description: Connection Response
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+[21:05:27] Connection request approved by server
+[21:05:28] Sending extended flight information for flight: F1848 from CYYZ to KJFK
+
+----- SENT PACKET [21:05:32] -----
+Description: Flight Plan
+HEADER
+SEQ_NUM=2
+TIMESTAMP=2025-03-31T21:05:32Z
+PAYLOAD_SIZE=153
+END_HEADER
+FLIGHT_PLAN
+FLIGHT_NUMBER=F1848
+AIRCRAFT_REG=1
+AIRCRAFT_TYPE=1
+OPERATOR=1
+DEP=CYYZ
+ARR=KJFK
+LAYOVER=CYUL
+ROUTE=1
+CRUISE_ALT=1
+SPEED=1
+EOBT=1
+ETD=1
+ETA=1
+
+----- END OF SENT PACKET -----
+
+----- SENT PACKET [21:05:37] -----
+Description: Flight Log
+HEADER
+SEQ_NUM=3
+TIMESTAMP=2025-03-31T21:05:37Z
+PAYLOAD_SIZE=120
+END_HEADER
+FLIGHT_LOG
+FLIGHT_NUMBER=F1848
+TOTAL_FLIGHT_TIME=1
+FUEL_ON_BOARD=1
+ESTIMATED_FUEL_BURN=1
+TOTAL_WEIGHT=1
+PIC=1
+REMARKS=1
+
+----- END OF SENT PACKET -----
+[21:05:37] Flight information sent successfully
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-31 21:08:23
+=================================================
+[21:08:23] NotamClient initialized
+[21:08:23] Winsock initialized successfully
+[21:08:23] Generated client ID: F1353
+[21:08:26] Attempting to connect to server at 127.0.0.1:8081
+[21:08:26] Connected to server successfully
+[21:08:27] Sending connection request for client ID: F1353
+
+----- SENT PACKET [21:08:27] -----
+Description: Connection Request
+HEADER
+SEQ_NUM=1
+TIMESTAMP=2025-03-31T21:08:27Z
+PAYLOAD_SIZE=35
+END_HEADER
+REQUEST_CONNECTION
+CLIENT_ID=F1353
+
+----- END OF SENT PACKET -----
+[21:08:27] Waiting to receive response from server
+
+----- RECEIVED PACKET [21:08:27] -----
+Description: Server Response (20 bytes)
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+
+----- RECEIVED PACKET [21:08:27] -----
+Description: Connection Response
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+[21:08:27] Connection request approved by server
+[21:08:28] Sending extended flight information for flight: F1353 from CYYZ to KJFK
+
+----- SENT PACKET [21:08:32] -----
+Description: Flight Plan
+HEADER
+SEQ_NUM=2
+TIMESTAMP=2025-03-31T21:08:32Z
+PAYLOAD_SIZE=153
+END_HEADER
+FLIGHT_PLAN
+FLIGHT_NUMBER=F1353
+AIRCRAFT_REG=1
+AIRCRAFT_TYPE=1
+OPERATOR=1
+DEP=CYYZ
+ARR=KJFK
+LAYOVER=CYUL
+ROUTE=1
+CRUISE_ALT=1
+SPEED=1
+EOBT=1
+ETD=1
+ETA=1
+
+----- END OF SENT PACKET -----
+
+----- SENT PACKET [21:08:36] -----
+Description: Flight Log
+HEADER
+SEQ_NUM=3
+TIMESTAMP=2025-03-31T21:08:36Z
+PAYLOAD_SIZE=121
+END_HEADER
+FLIGHT_LOG
+FLIGHT_NUMBER=F1353
+TOTAL_FLIGHT_TIME=11
+FUEL_ON_BOARD=1
+ESTIMATED_FUEL_BURN=1
+TOTAL_WEIGHT=1
+PIC=1
+REMARKS=1
+
+----- END OF SENT PACKET -----
+[21:08:36] Flight information sent successfully
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-03-31 21:08:55
+=================================================
+[21:08:55] NotamClient initialized
+[21:08:55] Winsock initialized successfully
+[21:08:55] Generated client ID: F1937
+[21:08:57] Attempting to connect to server at 127.0.0.1:8081
+[21:08:57] Connected to server successfully
+[21:08:58] Sending connection request for client ID: F1937
+
+----- SENT PACKET [21:08:58] -----
+Description: Connection Request
+HEADER
+SEQ_NUM=1
+TIMESTAMP=2025-03-31T21:08:58Z
+PAYLOAD_SIZE=35
+END_HEADER
+REQUEST_CONNECTION
+CLIENT_ID=F1937
+
+----- END OF SENT PACKET -----
+[21:08:58] Waiting to receive response from server
+
+----- RECEIVED PACKET [21:08:58] -----
+Description: Server Response (20 bytes)
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+
+----- RECEIVED PACKET [21:08:58] -----
+Description: Connection Response
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+[21:08:58] Connection request approved by server
+[21:09:00] Sending extended flight information for flight: F1937 from CYYZ to KJFK
+
+----- SENT PACKET [21:09:03] -----
+Description: Flight Plan
+HEADER
+SEQ_NUM=2
+TIMESTAMP=2025-03-31T21:09:03Z
+PAYLOAD_SIZE=153
+END_HEADER
+FLIGHT_PLAN
+FLIGHT_NUMBER=F1937
+AIRCRAFT_REG=1
+AIRCRAFT_TYPE=1
+OPERATOR=1
+DEP=CYYZ
+ARR=KJFK
+LAYOVER=CYUL
+ROUTE=1
+CRUISE_ALT=1
+SPEED=1
+EOBT=1
+ETD=1
+ETA=1
+
+----- END OF SENT PACKET -----
+
+----- SENT PACKET [21:09:25] -----
+Description: Flight Log
+HEADER
+SEQ_NUM=3
+TIMESTAMP=2025-03-31T21:09:25Z
+PAYLOAD_SIZE=120
+END_HEADER
+FLIGHT_LOG
+FLIGHT_NUMBER=F1937
+TOTAL_FLIGHT_TIME=1
+FUEL_ON_BOARD=1
+ESTIMATED_FUEL_BURN=1
+TOTAL_WEIGHT=1
+PIC=1
+REMARKS=1
+
+----- END OF SENT PACKET -----
+[21:09:25] Flight information sent successfully
+[21:09:34] Waiting to receive response from server
+
+----- RECEIVED PACKET [21:10:37] -----
+Description: Server Response (317 bytes)
+NOTAMS AFFECTING YOUR FLIGHT:
+NOTAM: A0245/25 for CYYZ - RWY 05/23 CLSD DUE SNOW REMOVAL
+NOTAM: B0178/25 for KBUF - TEMPO FLIGHT RESTRICTIONS DUE AIRSHOW PRACTICE
+NOTAM: E0211/25 for KJFK - CRANE OPERATIONS EAST OF RWY 13L/31R
+WEATHER UPDATES AFFECTING YOUR FLIGHT::
+WEATHER WARNING:
+High wind speed detected: 28km/h
+
+----- END OF RECEIVED PACKET -----
