@@ -229,7 +229,7 @@ struct ConnectionRequest {
 class ConnectionManager {
 public:
     static const size_t MAX_CONNECTIONS = 5;
-    std::set<std::string> activeClients;
+    std::map<std::string, SOCKET> activeClients; // Store client sockets
     std::mutex mutex;
 
 public:
@@ -238,12 +238,12 @@ public:
         return activeClients.size() < MAX_CONNECTIONS;
     }
 
-    bool addClient(const std::string& clientId) {
+    bool addClient(const std::string& clientId, SOCKET clientSocket) {
         std::lock_guard<std::mutex> lock(mutex);
         if (activeClients.size() >= MAX_CONNECTIONS) {
             return false;
         }
-        activeClients.insert(clientId);
+        activeClients[clientId] = clientSocket;
         return true;
     }
 
@@ -255,6 +255,81 @@ public:
     size_t getActiveClientCount() {
         std::lock_guard<std::mutex> lock(mutex);
         return activeClients.size();
+    }
+
+    std::vector<SOCKET> getATCsClients() {
+        std::vector<SOCKET> matchingClients;
+        std::lock_guard<std::mutex> lock(mutex);
+        for (const auto& client : activeClients) {
+            if (!client.first.empty() && client.first[0] == 'A') {
+                matchingClients.push_back(client.second);
+            }
+        }
+        return matchingClients;
+    }
+
+    void broadcastFlightPlan(const FlightPlan& flightPlan) {
+        // Get the list of ATC clients
+        std::vector<SOCKET> atcClients = getATCsClients();
+
+  
+        std::string flightPlanData = serializeFlightPlan(flightPlan);
+
+        // Generate the current timestamp
+        std::time_t now = std::time(nullptr);
+        std::tm* tmNow = std::localtime(&now);
+        std::stringstream timestampSS;
+        timestampSS << (1900 + tmNow->tm_year) << (tmNow->tm_mon + 1) << tmNow->tm_mday
+            << tmNow->tm_hour << tmNow->tm_min << tmNow->tm_sec;
+
+        // Generate sequence number (this can be incremented for each new packet)
+        static int seqNum = 1;
+
+        // Create the header
+        size_t payloadSize = flightPlanData.length();
+        std::stringstream headerSS;
+        headerSS << "HEADER\n"
+            << "SEQ_NUM=" << seqNum++ << "\n"
+            << "TIMESTAMP=" << timestampSS.str() << "\n"
+            << "PAYLOAD_SIZE=" << payloadSize << "\n"
+            << "END_HEADER\n";
+
+        // Combine header and payload into the final packet
+        std::string packet = headerSS.str() + flightPlanData;
+
+        // Send the packet to each ATC client
+        for (SOCKET clientSocket : atcClients) {
+            int bytesSent = send(clientSocket, packet.c_str(), static_cast<int>(packet.length()), 0);
+            if (bytesSent == SOCKET_ERROR) {
+                std::cerr << "Failed to send packet to client with socket " << clientSocket << "\n";
+            }
+        }
+    }
+
+    std::string serializeFlightPlan(const FlightPlan& flightPlan) {
+        std::ostringstream flightPlanStream;
+
+        flightPlanStream << "FLIGHT_ID=" << flightPlan.flightId << "\n"
+            << "DEPARTURE_AIRPORT=" << flightPlan.departureAirport << "\n"
+            << "ARRIVAL_AIRPORT=" << flightPlan.arrivalAirport << "\n"
+            << "AIRCRAFT_REG=" << flightPlan.aircraftReg << "\n"
+            << "AIRCRAFT_TYPE=" << flightPlan.aircraftType << "\n"
+            << "OPERATOR=" << flightPlan.operator_ << "\n"
+            << "ROUTE=" << flightPlan.route << "\n"
+            << "CRUISE_ALT=" << flightPlan.cruiseAlt << "\n"
+            << "SPEED=" << flightPlan.speed << "\n"
+            << "ETD_TIME=" << flightPlan.etdTime << "\n"
+            << "ETA_TIME=" << flightPlan.etaTime << "\n";
+
+        // Serialize route airspaces
+        for (const auto& airspace : flightPlan.routeAirspaces) {
+            flightPlanStream << "AIRSPACE_ID=" << airspace.identifier << "\n"
+                << "AIRSPACE_CENTER_LAT=" << airspace.center.latitude << "\n"
+                << "AIRSPACE_CENTER_LON=" << airspace.center.longitude << "\n"
+                << "AIRSPACE_RADIUS=" << airspace.radius << "\n";
+        }
+
+        return flightPlanStream.str();
     }
 };
 
@@ -736,7 +811,7 @@ public:
         : notamProcessor_(processor), weatherProcessor_(weatherProcessor), connectionManager_(connManager) {
     }
 
-    std::string processConnectionRequest(const std::string& clientData) {
+    std::string processConnectionRequest(const std::string& clientData, SOCKET clientSocket) {
         // Parse connection request
         ConnectionRequest request;
         std::string clientId = request.parseFromData(clientData);
@@ -748,7 +823,7 @@ public:
         // Check if we can accept connection
         bool accepted = connectionManager_.canAcceptConnection();
         if (accepted) {
-            connectionManager_.addClient(clientId);
+            connectionManager_.addClient(clientId, clientSocket);
             std::cout << "Connection accepted for client: " << clientId
                 << " (Active clients: " << connectionManager_.getActiveClientCount() << ")" << std::endl;
             return ConnectionRequest::createAcceptResponse();
@@ -885,6 +960,10 @@ public:
                     return response.str();
                 }
 
+				response << "*** FLIGHT PLAN ACCEPTED. NOTIFYNG TO RELEVANT ATCs. HAVE A SAFE FLIGHT. ***\n";
+
+                // Broadcast to ATCs
+                connectionManager_.broadcastFlightPlan(flightPlan);
 
                 return response.str();
             }
@@ -1024,7 +1103,7 @@ void handleClientConnection(SOCKET clientSocket, FlightDataHandler& dataHandler,
                 // Check if we can accept connection
                 bool accepted = connectionManager.canAcceptConnection();
                 if (accepted) {
-                    connectionManager.addClient(clientId);
+                    connectionManager.addClient(clientId, clientSocket);
                     std::cout << "Connection accepted for client: " << clientId
                         << " (Active clients: " << connectionManager.getActiveClientCount() << ")" << std::endl;
                     response = ConnectionRequest::createAcceptResponse();

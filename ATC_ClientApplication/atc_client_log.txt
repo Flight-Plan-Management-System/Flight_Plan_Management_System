@@ -1,0 +1,162 @@
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-04-01 00:33:52
+=================================================
+[00:33:52] NotamClient initialized
+[00:33:52] Winsock initialized successfully
+[00:33:52] Generated client ID: A1693
+[00:33:58] Attempting to connect to server at 127.0.0.1:8081
+[00:33:58] Connected to server successfully
+[00:33:59] Sending connection request for client ID: A1693
+
+----- SENT PACKET [00:33:59] -----
+Description: Connection Request
+HEADER
+SEQ_NUM=1
+TIMESTAMP=2025-04-01T00:33:59Z
+PAYLOAD_SIZE=35
+END_HEADER
+REQUEST_CONNECTION
+CLIENT_ID=A1693
+
+----- END OF SENT PACKET -----
+[00:33:59] Waiting to receive response from server
+
+----- RECEIVED PACKET [00:33:59] -----
+Description: Server Response (20 bytes)
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+
+----- RECEIVED PACKET [00:33:59] -----
+Description: Connection Response
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+[00:33:59] Connection request approved by server
+[00:34:01] Waiting to receive response from server
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-04-01 00:35:08
+=================================================
+[00:35:08] NotamClient initialized
+[00:35:08] Winsock initialized successfully
+[00:35:08] Generated client ID: A326
+[00:35:13] Attempting to connect to server at 127.0.0.1:8081
+[00:35:13] Connected to server successfully
+[00:35:14] Sending connection request for client ID: A326
+
+----- SENT PACKET [00:35:14] -----
+Description: Connection Request
+HEADER
+SEQ_NUM=1
+TIMESTAMP=2025-04-01T00:35:14Z
+PAYLOAD_SIZE=34
+END_HEADER
+REQUEST_CONNECTION
+CLIENT_ID=A326
+
+----- END OF SENT PACKET -----
+[00:35:14] Waiting to receive response from server
+
+----- RECEIVED PACKET [00:35:19] -----
+Description: Server Response (20 bytes)
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+
+----- RECEIVED PACKET [00:35:19] -----
+Description: Connection Response
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+[00:35:19] Connection request approved by server
+[00:35:21] Waiting to receive response from server
+[00:35:40] Receive failed with error: 10054
+[00:35:40] Disconnecting from server
+[00:35:40] Disconnected from server
+[00:35:40] Winsock cleaned up
+
+----- LOG SESSION ENDED -----
+
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-04-01 00:37:19
+=================================================
+[00:37:19] NotamClient initialized
+[00:37:19] Winsock initialized successfully
+[00:37:19] Generated client ID: A1520
+[00:37:23] Attempting to connect to server at 127.0.0.1:8081
+[00:37:23] Connected to server successfully
+[00:37:24] Sending connection request for client ID: A1520
+
+----- SENT PACKET [00:37:24] -----
+Description: Connection Request
+HEADER
+SEQ_NUM=1
+TIMESTAMP=2025-04-01T00:37:24Z
+PAYLOAD_SIZE=35
+END_HEADER
+REQUEST_CONNECTION
+CLIENT_ID=A1520
+
+----- END OF SENT PACKET -----
+[00:37:24] Waiting to receive response from server
+
+----- RECEIVED PACKET [00:38:16] -----
+Description: Server Response (20 bytes)
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+
+----- RECEIVED PACKET [00:38:16] -----
+Description: Connection Response
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+[00:38:16] Connection request approved by server
+[00:38:19] Waiting to receive response from server
+[00:38:41] Receive failed with error: 10054
+[00:38:41] Disconnecting from server
+[00:38:41] Disconnected from server
+[00:38:41] Winsock cleaned up
+
+----- LOG SESSION ENDED -----
+
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-04-01 00:39:27
+=================================================
+[00:39:27] NotamClient initialized
+[00:39:27] Winsock initialized successfully
+[00:39:27] Generated client ID: A3425
+[00:39:31] Attempting to connect to server at 127.0.0.1:8081
+[00:39:31] Connected to server successfully
+[00:39:32] Sending connection request for client ID: A3425
+
+----- SENT PACKET [00:39:32] -----
+Description: Connection Request
+HEADER
+SEQ_NUM=1
+TIMESTAMP=2025-04-01T00:39:32Z
+PAYLOAD_SIZE=35
+END_HEADER
+REQUEST_CONNECTION
+CLIENT_ID=A3425
+
+----- END OF SENT PACKET -----
+[00:39:32] Waiting to receive response from server
+
+----- RECEIVED PACKET [00:39:32] -----
+Description: Server Response (20 bytes)
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+
+----- RECEIVED PACKET [00:39:32] -----
+Description: Connection Response
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+[00:39:32] Connection request approved by server
+[00:39:34] Waiting to receive response from server
