@@ -13,6 +13,7 @@
 #include <chrono>
 #include <iomanip>
 #include <atomic>
+#include <map>
 
 #include <nlohmann/json.hpp>
 
@@ -505,12 +506,57 @@ public:
         }
 
         // Check wind speed
-        if (weatherConditions.windSpeed < 22) {
-            status.weatherMessage += "High wind speed detected: " + std::to_string(weatherConditions.tempMin) + "km/h\n";
+        if (weatherConditions.windSpeed > 22) {
+            status.weatherMessage += "High wind speed detected: " + std::to_string(weatherConditions.windSpeed) + "km/h\n";
             status.weatherGood = false;
         }
 
         return status;
+    }
+};
+
+// Class for Fuel Checking
+class FuelChecker {
+private:
+
+    std::map<std::string, int> fuelBurnRates = {
+        {"Boeing 737", 50},
+        {"Airbus A320", 45},
+        {"Embraer E175", 30},
+        {"Boeing 787", 100}
+    };
+    const int MINIMUM_RESERVE_FUEL = 1000; // minimum reserve fuel
+
+    // Convert HH:MM format flight time to total minutes
+    int convertFlightTimeToMinutes(const char* flightTime) {
+        int hours = (flightTime[0] - '0') * 10 + (flightTime[1] - '0');
+        int minutes = (flightTime[3] - '0') * 10 + (flightTime[4] - '0');
+        return (hours * 60) + minutes;
+    }
+
+public:
+    // Check if the aircraft has enough fuel for the flight
+    bool hasSufficientFuel(const FlightLog& log) {
+        return log.fuelOnBoard >= log.estimatedFuelBurn;
+    }
+
+    // Check if reserve fuel is within safe limits
+    bool meetsReserveFuelRequirement(const FlightLog& log) {
+        int remainingFuel = log.fuelOnBoard - log.estimatedFuelBurn;
+        return remainingFuel >= MINIMUM_RESERVE_FUEL;
+    }
+
+    // Detects unusual fuel burn rates
+    bool isUnusualFuelBurn(const FlightLog& log, const std::string & aircraftType) {
+        if (fuelBurnRates.find(aircraftType) == fuelBurnRates.end()) {
+            return false;
+        }
+
+        int expectedBurnRate = fuelBurnRates[aircraftType]; // Liters per minute
+        int flightDuration = convertFlightTimeToMinutes(log.totalFlightTime);
+        int expectedFuelBurn = flightDuration * expectedBurnRate;
+
+        return log.estimatedFuelBurn < expectedFuelBurn * 0.8 || log.estimatedFuelBurn > expectedFuelBurn * 1.2;
     }
 };
 
@@ -811,10 +857,33 @@ public:
                     response << "WEATHER UPDATE: Current conditions are favorable for flight operations.\n";
                 }
                 else {
+					// If weather is not good, reject the flight plan
                     response << "WEATHER WARNING:\n" << status.weatherMessage;
+					response << "*** FLIGHT PLAN REJECTED DUE TO ADVERSE WEATHER CONDITIONS. ***\n";
+                    return response.str();
                 }
 
+                // Check flight log fuel data
+                response << "FUEL CHECK RESULTS:\n";
 
+                FuelChecker fuelChecker;
+
+                if (!fuelChecker.hasSufficientFuel(flightLog)) {
+                    response << "WARNING: Insufficient fuel for estimated flight duration.\n";
+
+                    response << "*** FLIGHT PLAN REJECTED DUE TO INSUFFICIENT FUEL. ***\n";
+                    return response.str();
+                }
+                if (!fuelChecker.meetsReserveFuelRequirement(flightLog)) {
+                    response << "WARNING: Fuel reserves are below required minimum.\n";
+                    response << "RECOMMENDATION: Increase fuel load to meet safety requirements.\n";
+                }
+                if (fuelChecker.isUnusualFuelBurn(flightLog, flightPlan.aircraftType)) {
+                    response << "WARNING: Unusual fuel burn rate detected.\n";
+
+                    response << "*** FLIGHT PLAN REJECTED DUE TO UNUSUAL FUEL BURN RATE. ***\n";
+                    return response.str();
+                }
 
 
                 return response.str();
@@ -1178,6 +1247,7 @@ int32_t main(int argc, char* argv[]) {
 
     // Initialize Weather processor
     WeatherProcessor weatherProcessor(apiKey);
+
 
     // Initialize flight data handler
     FlightDataHandler handler(processor, weatherProcessor, connectionManager);
