@@ -17,12 +17,21 @@
 #include <nlohmann/json.hpp>
 
 #define CURL_STATICLIB
+#include "curl/curl.h"
+
+/*Windows Specific Additional Depenedencies*/
+#pragma comment (lib,"Normaliz.lib")
+#pragma comment (lib,"Ws2_32.lib")
+#pragma comment (lib,"Wldap32.lib")
+#pragma comment (lib,"Crypt32.lib")
 
 #include <curl/curl.h>
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #pragma comment(lib, "ws2_32.lib")
+
+using json = nlohmann::json;
 
 // Error handling utilities
 enum class ServerStateMachine
@@ -148,6 +157,19 @@ struct FlightPlan {
     std::vector<AirspaceInfo> routeAirspaces;
 };
 
+struct WeatherConditions {
+    int conditionCode;
+    char description[20];
+    int depVisibility;
+    int arrVisibility;
+    int avgTemp;
+    int tempMin;
+    int tempMax;
+    int windSpeed;
+    int timezone;
+    char airspace[32];
+};
+
 struct FlightLog {
     char flightId[16];
     char totalFlightTime[16];
@@ -156,20 +178,7 @@ struct FlightLog {
     int totalWeight;
     char picName[32];
     char remarks[256];
-    struct {
-        char depVisibility[16];
-        char arrVisibility[16];
-        int avgTemp;
-        int tempMin;
-        int tempMax;
-        int windSpeed;
-        int windDir;
-        int windGust;
-        char cloudInfo[64];
-        char precipitation[32];
-        char timezone[8];
-        char airspace[32];
-    } weatherInfo;
+	WeatherConditions weatherInfo;
 };
 
 struct Notam {
@@ -180,6 +189,11 @@ struct Notam {
     char endTime[20];
     AirspaceInfo affectedAirspace;
     char description[256];
+};
+
+struct WeatherStatus {
+    bool weatherGood;
+    std::string weatherMessage;
 };
 
 // Connection request handling
@@ -373,9 +387,137 @@ public:
     }
 };
 
+// Process Weather  to determine if they affect a flight
+class WeatherProcessor {
+private:
+    std::string apiKey_;
+
+    // Callback function to handle API response
+    static size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* output) {
+        size_t total_size = size * nmemb;
+        output->append((char*)contents, total_size);
+        return total_size;
+    }
+
+public:
+    WeatherProcessor(const std::string& apiKey)
+        : apiKey_(apiKey) {}
+
+    // Fetch weather data from API
+    std::string fetchWeatherData(double latitude, double longitude) {
+        CURL* curl;
+        CURLcode res;
+        std::string response_data;
+
+        std::string url = "https://api.openweathermap.org/data/2.5/weather?lat="
+            + std::to_string(latitude) + "&lon=" + std::to_string(longitude)
+            + "&units=metric&appid=" + apiKey_;
+
+        curl = curl_easy_init();
+        if (curl) {
+            curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_data);
+            curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+            curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10L);
+
+            res = curl_easy_perform(curl);
+            if (res != CURLE_OK) {
+                std::cerr << "Request failed: " << curl_easy_strerror(res) << std::endl;
+            }
+
+            curl_easy_cleanup(curl);
+        }
+        else {
+            std::cerr << "Failed to initialize cURL" << std::endl;
+        }
+
+        return response_data;
+    }
+
+    // Parse JSON and return a WeatherConditions struct
+    WeatherConditions parseWeatherData(const std::string& jsonData) {
+        WeatherConditions weatherConditions;
+
+        try {
+            json parsedJson = json::parse(jsonData);
+
+            // Extract values
+            weatherConditions.conditionCode = parsedJson["weather"][0]["id"];
+
+            std::string desc = parsedJson["weather"][0]["description"];
+            strncpy(weatherConditions.description, desc.c_str(), sizeof(weatherConditions.description) - 1);
+            weatherConditions.description[sizeof(weatherConditions.description) - 1] = '\0';
+
+            weatherConditions.arrVisibility = parsedJson["visibility"];
+
+            weatherConditions.avgTemp = parsedJson["main"]["temp"];
+            weatherConditions.tempMin = parsedJson["main"]["temp_min"];
+            weatherConditions.tempMax = parsedJson["main"]["temp_max"];
+
+            weatherConditions.windSpeed = parsedJson["wind"]["speed"];
+
+            weatherConditions.timezone = parsedJson["timezone"];
+        }
+        catch (const std::exception& e) {
+            std::cerr << "Error parsing weather data: " << e.what() << std::endl;
+        }
+
+        return weatherConditions;
+    }
+
+    // Update weather conditions and return the new conditions
+    WeatherConditions updateWeather(double latitude, double longitude) {
+        std::string jsonData = fetchWeatherData(latitude, longitude);
+        if (!jsonData.empty()) {
+            return parseWeatherData(jsonData);
+        }
+        else {
+            std::cerr << "Error: Received empty weather data" << std::endl;
+            return WeatherConditions(); // Return default/empty weather conditions
+        }
+    }
+
+    // Determine if weather conditions are safe
+    WeatherStatus isWeatherGood(const WeatherConditions& weatherConditions) {
+        WeatherStatus status;
+        status.weatherGood = true;
+        status.weatherMessage.clear();
+
+        // Condition codes that are not safe
+        std::set<int> badConditionCodes = { 202, 212, 221, 232, 302, 312, 314, 503, 504, 522, 531, 602, 622, 781 };
+
+        if (badConditionCodes.find(weatherConditions.conditionCode) != badConditionCodes.end()) {
+            status.weatherMessage += "Dangerous weather conditions detected: " + std::string(weatherConditions.description) + "\n";
+            status.weatherGood = false;
+        }
+
+        // Check visibility
+        if (weatherConditions.arrVisibility <= 4828) {
+            status.weatherMessage += "Reduced visibility detected: " + std::to_string(weatherConditions.arrVisibility) + " meters\n";
+            status.weatherGood = false;
+        }
+
+        // Check temperature
+        if (weatherConditions.tempMin < -40) {
+            status.weatherMessage += "Extreme low temperature detected: " + std::to_string(weatherConditions.tempMin) + "°C\n";
+            status.weatherGood = false;
+        }
+
+        // Check wind speed
+        if (weatherConditions.windSpeed < 22) {
+            status.weatherMessage += "High wind speed detected: " + std::to_string(weatherConditions.tempMin) + "km/h\n";
+            status.weatherGood = false;
+        }
+
+        return status;
+    }
+};
+
 class FlightDataHandler {
 private:
     NotamProcessor& notamProcessor_;
+    WeatherProcessor& weatherProcessor_;
     ConnectionManager& connectionManager_;
 
     // Cached state for multi-packet handling
@@ -508,18 +650,44 @@ private:
                 (void)SafeString::copy(log.remarks, sizeof(log.remarks), line.substr(8).c_str());
             }
             // Weather info parsing
-            else if (line.find("DEP_VISIBILITY=") == 0) {
-                (void)SafeString::copy(log.weatherInfo.depVisibility, sizeof(log.weatherInfo.depVisibility), line.substr(15).c_str());
+            else if (line.find("WEATHER_CONDITION_CODE=") == 0) {
+                log.weatherInfo.conditionCode = std::stoi(line.substr(22));
             }
-            // Add similar parsing for other weather fields...
+            else if (line.find("WEATHER_DESCRIPTION=") == 0) {
+                (void)SafeString::copy(log.weatherInfo.description, sizeof(log.weatherInfo.description), line.substr(20).c_str());
+            }
+            else if (line.find("DEP_VISIBILITY=") == 0) {
+                log.weatherInfo.depVisibility = std::stoi(line.substr(15));
+            }
+            else if (line.find("ARR_VISIBILITY=") == 0) {
+                log.weatherInfo.arrVisibility = std::stoi(line.substr(15));
+            }
+            else if (line.find("AVG_TEMP=") == 0) {
+                log.weatherInfo.avgTemp = std::stoi(line.substr(9));
+            }
+            else if (line.find("TEMP_MIN=") == 0) {
+                log.weatherInfo.tempMin = std::stoi(line.substr(9));
+            }
+            else if (line.find("TEMP_MAX=") == 0) {
+                log.weatherInfo.tempMax = std::stoi(line.substr(9));
+            }
+            else if (line.find("WIND_SPEED=") == 0) {
+                log.weatherInfo.windSpeed = std::stoi(line.substr(11));
+            }
+            else if (line.find("TIMEZONE=") == 0) {
+                log.weatherInfo.timezone = std::stoi(line.substr(9));
+            }
+            else if (line.find("AIRSPACE=") == 0) {
+                (void)SafeString::copy(log.weatherInfo.airspace, sizeof(log.weatherInfo.airspace), line.substr(9).c_str());
+            }
         }
 
         return log;
     }
 
 public:
-    explicit FlightDataHandler(NotamProcessor& processor, ConnectionManager& connManager)
-        : notamProcessor_(processor), connectionManager_(connManager) {
+    explicit FlightDataHandler(NotamProcessor& processor, WeatherProcessor& weatherProcessor, ConnectionManager& connManager)
+        : notamProcessor_(processor), weatherProcessor_(weatherProcessor), connectionManager_(connManager) {
     }
 
     std::string processConnectionRequest(const std::string& clientData) {
@@ -611,6 +779,8 @@ public:
                 // Parse and store flight plan
                 FlightPlan flightPlan = parseFlightPlan(fullMessage);
 
+				FlightLog flightLog = parseFlightLog(fullMessage);
+
                 // Get relevant NOTAMs
                 std::vector<const Notam*> relevantNotams = notamProcessor_.getRelevantNotams(flightPlan);
 
@@ -625,6 +795,27 @@ public:
                     response << "NOTAM: " << notam->identifier << " for " << notam->location;
                     response << " - " << notam->description << "\n";
                 }
+
+                WeatherConditions conditions = weatherProcessor_.updateWeather(
+                    flightPlan.routeAirspaces[0].center.latitude,
+                    flightPlan.routeAirspaces[0].center.longitude
+                );
+
+                // Add to response with weather updates
+                response << "WEATHER UPDATES AFFECTING YOUR FLIGHT::\n";
+
+                // Pass the weather conditions to isWeatherGood
+                WeatherStatus status = weatherProcessor_.isWeatherGood(conditions);
+
+                if (status.weatherGood) {
+                    response << "WEATHER UPDATE: Current conditions are favorable for flight operations.\n";
+                }
+                else {
+                    response << "WEATHER WARNING:\n" << status.weatherMessage;
+                }
+
+
+
 
                 return response.str();
             }
@@ -973,14 +1164,23 @@ int32_t main(int argc, char* argv[]) {
         std::cout << "Loaded NOTAM database from: " << notamFile << std::endl;
     }
 
+    // 	// api key for openweathermap
+    std::string apiKey = "445b28699592a8c90c07b345dd4de9cd";
+
     // Initialize connection manager
     ConnectionManager connectionManager;
 
     // Initialize NOTAM processor
     NotamProcessor processor(notamDb);
 
+    // Initialize weather conditions
+    WeatherConditions conditions;
+
+    // Initialize Weather processor
+    WeatherProcessor weatherProcessor(apiKey);
+
     // Initialize flight data handler
-    FlightDataHandler handler(processor, connectionManager);
+    FlightDataHandler handler(processor, weatherProcessor, connectionManager);
 
     // Start the TCP server
     TcpServer server(handler, connectionManager);

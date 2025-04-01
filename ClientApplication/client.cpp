@@ -177,7 +177,8 @@ public:
 #endif
 
         std::stringstream timestampSS;
-        timestampSS << std::put_time(&timeInfo, "%Y-%m-%dT%H:%M:%S.%fZ");
+        //timestampSS << std::put_time(&timeInfo, "%Y-%m-%dT%H:%M:%S.%fZ");
+        timestampSS << std::put_time(&timeInfo, "%Y-%m-%dT%H:%M:%SZ");
 
         // Calculate payload size
         size_t payloadSize = payload.length();
