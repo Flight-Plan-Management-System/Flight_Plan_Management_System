@@ -879,6 +879,7 @@ void displayNotamInfo(const std::string& response, const std::string& flightId)
             std::cout << " " << std::left << std::setw(52) << line << "\n";
         }
     }
+};
 
 int main(void)
 {
