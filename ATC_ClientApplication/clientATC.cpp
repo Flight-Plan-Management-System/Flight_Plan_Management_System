@@ -242,13 +242,13 @@ public:
         flightNumDist = std::uniform_int_distribution<int>(100, 4999);
     }
 
-    std::string generateFlightNumber() {
-        // Always start with F followed by 3-4 digits
-        return "F" + std::to_string(flightNumDist(rng));
+    std::string generateATCNumber() {
+        // Always start with A followed by 3-4 digits
+        return "A" + std::to_string(flightNumDist(rng));
     }
 };
 
-class NotamClient {
+class ATC_client {
 private:
     SOCKET clientSocket;
     bool initialized;
@@ -274,14 +274,14 @@ private:
     }
 
 public:
-    NotamClient() :
+    ATC_client() :
         clientSocket(INVALID_SOCKET),
         initialized(false),
         isConnected(false),
         isApproved(false) {
 
         // Initialize logger
-        if (logger.initialize("notam_client_log.txt")) {
+        if (logger.initialize("atc_client_log.txt")) {
             PacketHeader::setLogger(&logger);
             logger.logEvent("NotamClient initialized");
         }
@@ -298,11 +298,11 @@ public:
         logger.logEvent("Winsock initialized successfully");
 
         FlightNumberGenerator generator;
-        clientId = generator.generateFlightNumber();
+        clientId = generator.generateATCNumber();
         logger.logEvent("Generated client ID: " + clientId);
     }
 
-    ~NotamClient() {
+    ~ATC_client() {
         disconnect();
         if (initialized) {
             WSACleanup();
@@ -412,108 +412,6 @@ public:
 
         isApproved = true;
         logger.logEvent("Connection request approved by server");
-        return ServerStateMachine::SUCCESS;
-    }
-
-    // Send extended flight information
-    ServerStateMachine sendExtendedFlightInformation(const std::string& flightId, const std::string& departure, const std::string& arrival) {
-        if (clientSocket == INVALID_SOCKET || !isConnected || !isApproved) {
-            logger.logEvent("ERROR: Not connected or approved by server");
-            return ServerStateMachine::CONNECTION_ERROR;
-        }
-
-        logger.logEvent("Sending extended flight information for flight: " + flightId +
-            " from " + departure + " to " + arrival);
-
-        // Prompt user for additional flight details
-        std::string aircraftReg, aircraftType, operatorName, route, cruiseAlt, speed, eobt, etd, eta;
-        std::cout << "Enter Aircraft Registration: ";
-        std::getline(std::cin, aircraftReg);
-        std::cout << "Enter Aircraft Type: ";
-        std::getline(std::cin, aircraftType);
-        std::cout << "Enter Operator Name: ";
-        std::getline(std::cin, operatorName);
-        std::cout << "Enter Route: ";
-        std::getline(std::cin, route);
-        std::cout << "Enter Cruise Altitude: ";
-        std::getline(std::cin, cruiseAlt);
-        std::cout << "Enter Speed: ";
-        std::getline(std::cin, speed);
-        std::cout << "Enter EOBT (Estimated Off-Block Time): ";
-        std::getline(std::cin, eobt);
-        std::cout << "Enter ETD (Estimated Time of Departure): ";
-        std::getline(std::cin, etd);
-        std::cout << "Enter ETA (Estimated Time of Arrival): ";
-        std::getline(std::cin, eta);
-
-        // Flight Plan Packet
-        std::string flightPlan = std::string("FLIGHT_PLAN\n") +
-            "FLIGHT_NUMBER=" + flightId + "\n" +
-            "AIRCRAFT_REG=" + aircraftReg + "\n" +
-            "AIRCRAFT_TYPE=" + aircraftType + "\n" +
-            "OPERATOR=" + operatorName + "\n" +
-            "DEP=" + departure + "\n" +
-            "ARR=" + arrival + "\n" +
-            "LAYOVER=CYUL\n" +
-            "ROUTE=" + route + "\n" +
-            "CRUISE_ALT=" + cruiseAlt + "\n" +
-            "SPEED=" + speed + "\n" +
-            "EOBT=" + eobt + "\n" +
-            "ETD=" + etd + "\n" +
-            "ETA=" + eta + "\n";
-
-        std::string flightPlanWithHeader = PacketHeader::createHeader(flightPlan) + flightPlan;
-        logger.logSentPacket(flightPlanWithHeader, "Flight Plan");
-
-        int sendResult = send(clientSocket, flightPlanWithHeader.c_str(), static_cast<int>(flightPlanWithHeader.length()), 0);
-        if (sendResult == SOCKET_ERROR) {
-            int error = WSAGetLastError();
-            std::cerr << "Send flight plan failed: " << error << std::endl;
-            logger.logEvent("Send flight plan failed with error: " + std::to_string(error));
-            return ServerStateMachine::SEND_ERROR;
-        }
-
-        // Add a small delay to simulate packet separation
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-
-        // Prompt user for additional flight log details
-        std::string totalFlightTime, fuelOnBoard, estimatedFuelBurn, totalWeight, pic, remarks;
-        std::cout << "Enter Total Flight Time (HH:MM): ";
-        std::getline(std::cin, totalFlightTime);
-        std::cout << "Enter Fuel On Board (L): ";
-        std::getline(std::cin, fuelOnBoard);
-        std::cout << "Enter Estimated Fuel Burn (L/min): ";
-        std::getline(std::cin, estimatedFuelBurn);
-        std::cout << "Enter Total Weight (KG): ";
-        std::getline(std::cin, totalWeight);
-        std::cout << "Enter PIC (Pilot in Command): ";
-        std::getline(std::cin, pic);
-        std::cout << "Enter Remarks: ";
-        std::getline(std::cin, remarks);
-
-        // Flight Log Packet
-        std::string flightLog = std::string("FLIGHT_LOG\n") +
-            "FLIGHT_NUMBER=" + flightId + "\n" +
-            "TOTAL_FLIGHT_TIME=" + totalFlightTime + "\n" +
-            "FUEL_ON_BOARD=" + fuelOnBoard + "\n" +
-            "ESTIMATED_FUEL_BURN=" + estimatedFuelBurn + "\n" +
-            "TOTAL_WEIGHT=" + totalWeight + "\n" +
-            "PIC=" + pic + "\n" +
-            "REMARKS=" + remarks + "\n";
-
-        std::string flightLogWithHeader = PacketHeader::createHeader(flightLog) + flightLog;
-        logger.logSentPacket(flightLogWithHeader, "Flight Log");
-
-        // Send Flight Log
-        sendResult = send(clientSocket, flightLogWithHeader.c_str(), static_cast<int>(flightLogWithHeader.length()), 0);
-        if (sendResult == SOCKET_ERROR) {
-            int error = WSAGetLastError();
-            std::cerr << "Send flight log failed: " << error << std::endl;
-            logger.logEvent("Send flight log failed with error: " + std::to_string(error));
-            return ServerStateMachine::SEND_ERROR;
-        }
-
-        logger.logEvent("Flight information sent successfully");
         return ServerStateMachine::SUCCESS;
     }
 
@@ -641,7 +539,7 @@ void clearScreen() {
 void printHeader() {
     clearScreen(); // Clear screen in a platform-independent way
     std::cout << "-------------------------------------------------------------\n";
-    std::cout << "|                 NOTAM CLIENT APPLICATION                   |\n";
+    std::cout << "|                 ATC CLIENT APPLICATION                   |\n";
     std::cout << "-------------------------------------------------------------\n\n";
 }
 
@@ -758,7 +656,7 @@ int getIntInput(const std::string& prompt) {
 }
 
 // Function to handle server connection setup
-bool setupServerConnection(NotamClient& client, std::string& serverIP, int& serverPort) {
+bool setupServerConnection(ATC_client& client, std::string& serverIP, int& serverPort) {
     printSection("SERVER CONNECTION SETUP");
 
     char choice = getCharInput("Use default server settings (127.0.0.1:8081)? (y/n): ");
@@ -816,55 +714,13 @@ bool setupServerConnection(NotamClient& client, std::string& serverIP, int& serv
     return true;
 }
 
-// Function to select flight details
-bool selectFlight(std::string& flightId, std::string& departure, std::string& arrival)
-{
-    printSection("FLIGHT SELECTION");
-
-    std::cout << "Select a flight to check NOTAMs:\n\n";
-    std::cout << "  1. Toronto (CYYZ) to New York (KJFK)\n";
-    std::cout << "  2. Waterloo (CYKF) to Montreal (CYUL)\n";
-    std::cout << "  3. Custom flight\n\n";
-
-    int flightChoice = getIntInput("Enter your choice (1-3): ");
-
-    bool isValidSelection = true;
-
-    // Set flight details based on user selection
-    if (1 == flightChoice)
-    {
-        departure = "CYYZ";  // Toronto
-        arrival = "KJFK";    // New York JFK
-        printSuccess("Selected flight: Toronto (CYYZ) to New York (KJFK)");
-    }
-    else if (2 == flightChoice)
-    {
-        departure = "CYKF";  // Waterloo
-        arrival = "CYUL";    // Montreal
-        printSuccess("Selected flight: Waterloo (CYKF) to Montreal (CYUL)");
-    }
-    else if (3 == flightChoice)
-    {
-        departure = getInput("Enter departure airport code (e.g., CYYZ): ");
-        arrival = getInput("Enter arrival airport code (e.g., KJFK): ");
-        printSuccess("Selected flight: " + departure + " to " + arrival);
-    }
-    else
-    {
-        printError("Invalid selection. Please try again.");
-        isValidSelection = false;
-    }
-
-    return isValidSelection;
-}
-
 // Function to display NOTAM information
-void displayNotamInfo(const std::string& response, const std::string& flightId)
+void displayFlightPlanInfo(const std::string& response, const std::string& ATCid)
 {
-    printSection("NOTAM INFORMATION");
+    printSection("FLIGHT PLAN INFORMATION");
 
     std::cout << "-------------------------------------------------------------\n";
-    std::cout << "|             NOTAM INFO FOR FLIGHT " << std::left << std::setw(17) << flightId << "        |\n";
+    std::cout << "|             FLIGHT PLAN INFO FOR ATC " << std::left << std::setw(17) << ATCid << "        |\n";
     std::cout << "-------------------------------------------------------------\n";
 
     // Process response to display in a more formatted way
@@ -885,13 +741,13 @@ int main(void)
     // Initialize variables
     std::string serverIP = "127.0.0.1";  // Default server IP
     int serverPort = DEFAULT_SERVER_PORT;              // Default server port
-    std::string flightId;
+    std::string ATCid;
     std::string departure;
     std::string arrival;
     int returnCode = 0;
 
     // Create NOTAM client
-    NotamClient client;
+    ATC_client client;
 
     // Display application header
     printHeader();
@@ -908,55 +764,29 @@ int main(void)
     else
     {
         // Select flight for NOTAM information
-        flightId = client.getClientId(); // Use client ID as flight ID
+        ATCid = client.getClientId(); // Use client ID as flight ID
 
-        if (!selectFlight(flightId, departure, arrival))
+
+        printInfo("Waiting for  information from server...");
+        showSpinner("Processing Flight Plan data", 2);
+
+        std::string response = client.receiveResponse();
+
+        if (std::string::npos != response.find("ERROR"))
         {
-            printError("Flight selection failed.");
+            printError("Failed to receive Flight Plan information.");
             client.disconnect();
             returnCode = 1;
         }
         else
         {
-            // Send flight information
-            printSection("SENDING FLIGHT INFORMATION");
-            printInfo("Preparing to send extended flight information to server...");
+            // Display Flight Plan information
+            displayFlightPlanInfo(response, ATCid);
 
-            ServerStateMachine result = client.sendExtendedFlightInformation(flightId, departure, arrival);
-
-            if (ServerStateMachine::SUCCESS != result)
-            {
-                printError("Failed to send flight information.");
-                client.disconnect();
-                returnCode = 1;
-            }
-            else
-            {
-                printSuccess("Flight information sent successfully!");
-
-                // Receive and display NOTAM information
-                printInfo("Waiting for NOTAM information from server...");
-                showSpinner("Processing NOTAM data", 2);
-
-                std::string response = client.receiveResponse();
-
-                if (std::string::npos != response.find("ERROR"))
-                {
-                    printError("Failed to receive NOTAM information.");
-                    client.disconnect();
-                    returnCode = 1;
-                }
-                else
-                {
-                    // Display NOTAM information
-                    displayNotamInfo(response, flightId);
-
-                    // Clean up and exit
-                    printSection("CONNECTION COMPLETE");
-                    printInfo("Press Enter to disconnect and exit...");
-                    std::cin.get();
-                }
-            }
+            // Clean up and exit
+            printSection("CONNECTION COMPLETE");
+            printInfo("Press Enter to disconnect and exit...");
+            std::cin.get();
         }
     }
 
