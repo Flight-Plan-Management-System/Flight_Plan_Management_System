@@ -2827,3 +2827,191 @@ CLIENT_ID=F2129
 
 ----- END OF SENT PACKET -----
 [00:39:48] Waiting to receive response from server
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-04-05 11:57:15
+=================================================
+[11:57:15] NotamClient initialized
+[11:57:15] Winsock initialized successfully
+[11:57:15] Generated client ID: F942
+[11:57:20] Attempting to connect to server at 127.0.0.1:8081
+[11:57:20] Connected to server successfully
+[11:57:21] Sending connection request for client ID: F942
+
+----- SENT PACKET [11:57:21] -----
+Description: Connection Request
+HEADER
+SEQ_NUM=1
+TIMESTAMP=2025-04-05T11:57:21Z
+PAYLOAD_SIZE=34
+END_HEADER
+REQUEST_CONNECTION
+CLIENT_ID=F942
+
+----- END OF SENT PACKET -----
+[11:57:21] Waiting to receive response from server
+
+----- RECEIVED PACKET [11:57:21] -----
+Description: Server Response (20 bytes)
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+
+----- RECEIVED PACKET [11:57:21] -----
+Description: Connection Response
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+[11:57:21] Connection request approved by server
+[11:57:26] Sending extended flight information for flight: F942 from CYKF to CYUL
+
+----- SENT PACKET [11:57:32] -----
+Description: Flight Plan
+HEADER
+SEQ_NUM=2
+TIMESTAMP=2025-04-05T11:57:32Z
+PAYLOAD_SIZE=152
+END_HEADER
+FLIGHT_PLAN
+FLIGHT_NUMBER=F942
+AIRCRAFT_REG=1
+AIRCRAFT_TYPE=1
+OPERATOR=1
+DEP=CYKF
+ARR=CYUL
+LAYOVER=CYUL
+ROUTE=1
+CRUISE_ALT=1
+SPEED=1
+EOBT=1
+ETD=1
+ETA=1
+
+----- END OF SENT PACKET -----
+
+----- SENT PACKET [11:57:34] -----
+Description: Flight Log
+HEADER
+SEQ_NUM=3
+TIMESTAMP=2025-04-05T11:57:34Z
+PAYLOAD_SIZE=118
+END_HEADER
+FLIGHT_LOG
+FLIGHT_NUMBER=F942
+TOTAL_FLIGHT_TIME=1
+FUEL_ON_BOARD=1
+ESTIMATED_FUEL_BURN=
+TOTAL_WEIGHT=1
+PIC=1
+REMARKS=1
+
+----- END OF SENT PACKET -----
+[11:57:34] Flight information sent successfully
+[11:57:36] Waiting to receive response from server
+
+----- RECEIVED PACKET [11:57:36] -----
+Description: Server Response (60 bytes)
+ERROR: Processing flight data failed - invalid stoi argument
+----- END OF RECEIVED PACKET -----
+[11:57:36] Disconnecting from server
+[11:57:36] Disconnected from server
+[11:57:36] Winsock cleaned up
+
+----- LOG SESSION ENDED -----
+
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-04-05 11:57:48
+=================================================
+[11:57:48] NotamClient initialized
+[11:57:48] Winsock initialized successfully
+[11:57:48] Generated client ID: F1137
+[11:57:51] Attempting to connect to server at 127.0.0.1:8081
+[11:57:51] Connected to server successfully
+[11:57:52] Sending connection request for client ID: F1137
+
+----- SENT PACKET [11:57:52] -----
+Description: Connection Request
+HEADER
+SEQ_NUM=1
+TIMESTAMP=2025-04-05T11:57:52Z
+PAYLOAD_SIZE=35
+END_HEADER
+REQUEST_CONNECTION
+CLIENT_ID=F1137
+
+----- END OF SENT PACKET -----
+[11:57:52] Waiting to receive response from server
+
+----- RECEIVED PACKET [11:57:52] -----
+Description: Server Response (20 bytes)
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+
+----- RECEIVED PACKET [11:57:52] -----
+Description: Connection Response
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+[11:57:52] Connection request approved by server
+[11:57:53] Sending extended flight information for flight: F1137 from CYYZ to KJFK
+
+----- SENT PACKET [11:57:57] -----
+Description: Flight Plan
+HEADER
+SEQ_NUM=2
+TIMESTAMP=2025-04-05T11:57:57Z
+PAYLOAD_SIZE=154
+END_HEADER
+FLIGHT_PLAN
+FLIGHT_NUMBER=F1137
+AIRCRAFT_REG=1
+AIRCRAFT_TYPE=1
+OPERATOR=1
+DEP=CYYZ
+ARR=KJFK
+LAYOVER=CYUL
+ROUTE=1
+CRUISE_ALT=1
+SPEED=1
+EOBT=11
+ETD=1
+ETA=1
+
+----- END OF SENT PACKET -----
+
+----- SENT PACKET [11:58:01] -----
+Description: Flight Log
+HEADER
+SEQ_NUM=3
+TIMESTAMP=2025-04-05T11:58:01Z
+PAYLOAD_SIZE=120
+END_HEADER
+FLIGHT_LOG
+FLIGHT_NUMBER=F1137
+TOTAL_FLIGHT_TIME=1
+FUEL_ON_BOARD=1
+ESTIMATED_FUEL_BURN=1
+TOTAL_WEIGHT=1
+PIC=1
+REMARKS=1
+
+----- END OF SENT PACKET -----
+[11:58:01] Flight information sent successfully
+[11:58:03] Waiting to receive response from server
+
+----- RECEIVED PACKET [11:58:03] -----
+Description: Server Response (551 bytes)
+NOTAMS AFFECTING YOUR FLIGHT:
+NOTAM: A0245/25 for CYYZ - RWY 05/23 CLSD DUE SNOW REMOVAL
+NOTAM: B0178/25 for KBUF - TEMPO FLIGHT RESTRICTIONS DUE AIRSHOW PRACTICE
+NOTAM: E0211/25 for KJFK - CRANE OPERATIONS EAST OF RWY 13L/31R
+WEATHER UPDATES AFFECTING YOUR FLIGHT::
+WEATHER UPDATE: Current conditions are favorable for flight operations.
+FUEL CHECK RESULTS:
+WARNING: Fuel reserves are below required minimum.
+RECOMMENDATION: Increase fuel load to meet safety requirements.
+*** FLIGHT PLAN ACCEPTED. NOTIFYNG TO RELEVANT ATCs. HAVE A SAFE FLIGHT. ***
+
+----- END OF RECEIVED PACKET -----

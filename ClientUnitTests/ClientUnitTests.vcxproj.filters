@@ -15,17 +15,15 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="client.cpp">
+    <ClCompile Include="ClientUnitTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-    <None Include="$(MSBuildThisFileDirectory)\libcurl.dll" />
-    <None Include="$(MSBuildThisFileDirectory)\LibCurlShim.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="NotamClient.h">
+    <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

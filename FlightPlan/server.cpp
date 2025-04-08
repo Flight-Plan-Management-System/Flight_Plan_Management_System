@@ -15,7 +15,7 @@
 #include <atomic>
 #include <map>
 
-#include <nlohmann/json.hpp>
+//#include <nlohmann/json.hpp>
 
 #define CURL_STATICLIB
 #include "curl/curl.h"
@@ -26,7 +26,6 @@
 #pragma comment (lib,"Wldap32.lib")
 #pragma comment (lib,"Crypt32.lib")
 
-#include <curl/curl.h>
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
