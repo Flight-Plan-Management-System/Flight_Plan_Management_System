@@ -160,3 +160,144 @@ CONNECTION_ACCEPTED
 ----- END OF RECEIVED PACKET -----
 [00:39:32] Connection request approved by server
 [00:39:34] Waiting to receive response from server
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-04-09 15:58:52
+=================================================
+[15:58:52] NotamClient initialized
+[15:58:52] Winsock initialized successfully
+[15:58:52] Generated client ID: A1290
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-04-09 15:59:30
+=================================================
+[15:59:30] NotamClient initialized
+[15:59:30] Winsock initialized successfully
+[15:59:30] Generated client ID: A574
+[15:59:39] Attempting to connect to server at 127.0.0.1:8080
+[15:59:41] Connection failed with error: 10061
+[15:59:51] Winsock cleaned up
+
+----- LOG SESSION ENDED -----
+
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-04-09 16:00:27
+=================================================
+[16:00:27] NotamClient initialized
+[16:00:27] Winsock initialized successfully
+[16:00:27] Generated client ID: A1449
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-04-09 16:01:13
+=================================================
+[16:01:13] NotamClient initialized
+[16:01:13] Winsock initialized successfully
+[16:01:13] Generated client ID: A445
+[16:01:17] Attempting to connect to server at 127.0.0.1:8081
+[16:01:17] Connected to server successfully
+[16:01:18] Sending connection request for client ID: A445
+
+----- SENT PACKET [16:01:18] -----
+Description: Connection Request
+HEADER
+SEQ_NUM=1
+TIMESTAMP=2025-04-09T16:01:18Z
+PAYLOAD_SIZE=34
+END_HEADER
+REQUEST_CONNECTION
+CLIENT_ID=A445
+
+----- END OF SENT PACKET -----
+[16:01:18] Waiting to receive response from server
+
+----- RECEIVED PACKET [16:01:18] -----
+Description: Server Response (20 bytes)
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+
+----- RECEIVED PACKET [16:01:18] -----
+Description: Connection Response
+CONNECTION_ACCEPTED
+
+----- END OF RECEIVED PACKET -----
+[16:01:18] Connection request approved by server
+[16:01:20] Waiting to receive response from server
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-04-09 16:02:11
+=================================================
+[16:02:11] NotamClient initialized
+[16:02:11] Winsock initialized successfully
+[16:02:11] Generated client ID: A3673
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-04-09 16:03:30
+=================================================
+[16:03:30] NotamClient initialized
+[16:03:30] Winsock initialized successfully
+[16:03:30] Generated client ID: A282
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-04-09 16:20:45
+=================================================
+[16:20:45] NotamClient initialized
+[16:20:45] Winsock initialized successfully
+[16:20:45] Generated client ID: A2787
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-04-09 16:40:33
+=================================================
+[16:40:33] NotamClient initialized
+[16:40:33] Winsock initialized successfully
+[16:40:33] Generated client ID: A3110
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-04-09 16:44:06
+=================================================
+[16:44:06] NotamClient initialized
+[16:44:06] Winsock initialized successfully
+[16:44:06] Generated client ID: A1236
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-04-09 17:47:13
+=================================================
+[17:47:13] NotamClient initialized
+[17:47:13] Winsock initialized successfully
+[17:47:13] Generated client ID: A4051
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-04-09 17:51:40
+=================================================
+[17:51:40] NotamClient initialized
+[17:51:40] Winsock initialized successfully
+[17:51:40] Generated client ID: A3745
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-04-09 17:53:00
+=================================================
+[17:53:00] NotamClient initialized
+[17:53:00] Winsock initialized successfully
+[17:53:00] Generated client ID: A699
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-04-09 17:53:57
+=================================================
+[17:53:57] NotamClient initialized
+[17:53:57] Winsock initialized successfully
+[17:53:57] Generated client ID: A3755
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-04-09 17:54:57
+=================================================
+[17:54:57] NotamClient initialized
+[17:54:57] Winsock initialized successfully
+[17:54:57] Generated client ID: A478
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-04-09 17:55:54
+=================================================
+[17:55:54] NotamClient initialized
+[17:55:54] Winsock initialized successfully
+[17:55:54] Generated client ID: A4160
