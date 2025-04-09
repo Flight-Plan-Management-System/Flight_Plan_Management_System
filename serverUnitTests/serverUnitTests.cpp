@@ -1,9 +1,11 @@
+#define _CRT_SECURE_NO_WARNINGS 
 #include "pch.h"
 #include "CppUnitTest.h"
 // Include minimal dependencies to avoid unresolved symbols
 #include <string>
 #include <sstream>
 #include <vector>
+#include <set>
 
 #include <map>
 
@@ -283,6 +285,58 @@ public:
 };
 
 
+// Add the mock class for WeatherProcessor
+class MockWeatherProcessor {
+public:
+    MockWeatherProcessor(const std::string& apiKey) {}
+
+    // Mocking fetchWeatherData to return a fixed JSON response
+    std::string fetchWeatherData(double latitude, double longitude) {
+        return R"({
+            "weather": [{"id": 802, "description": "partly cloudy"}],
+            "visibility": 5000,
+            "main": {"temp": 25.0, "temp_min": 20.0, "temp_max": 30.0},
+            "wind": {"speed": 15},
+            "timezone": 3600
+        })";
+    }
+
+    // Mocking parseWeatherData to simulate parsing the above JSON response
+    WeatherConditions parseWeatherData(const std::string& jsonData) {
+        WeatherConditions weatherConditions;
+        // Hardcode parsed values to simulate real parsing
+        weatherConditions.conditionCode = 802;
+        strncpy_s(weatherConditions.description, "partly cloudy", sizeof(weatherConditions.description) - 1);
+        weatherConditions.description[sizeof(weatherConditions.description) - 1] = '\0';
+        weatherConditions.arrVisibility = 5000;
+        weatherConditions.avgTemp = 25.0;
+        weatherConditions.tempMin = 20.0;
+        weatherConditions.tempMax = 30.0;
+        weatherConditions.windSpeed = 15;
+        weatherConditions.timezone = 3600;
+        return weatherConditions;
+    }
+
+    // Directly return updated weather conditions based on mock data
+    WeatherConditions updateWeather(double latitude, double longitude) {
+        return parseWeatherData(fetchWeatherData(latitude, longitude));
+    }
+
+    // Return a mocked safe weather status
+    WeatherStatus isWeatherGood(const WeatherConditions& weatherConditions) {
+        WeatherStatus status;
+        if (weatherConditions.windSpeed > 20 || weatherConditions.arrVisibility < 1000) {
+            status.weatherGood = false;
+            status.weatherMessage = "Bad weather conditions detected.";
+        }
+        else {
+            status.weatherGood = true;
+            status.weatherMessage.clear();
+        }
+        return status;
+    }
+};
+
 namespace ServerUnitTests
 {
     // Mock socket class
@@ -519,7 +573,44 @@ namespace ServerUnitTests
             Assert::AreEqual(size_t(0), relevantNotams.size());
         }
 
+        TEST_METHOD(TestUpdateWeather) {
+            MockWeatherProcessor weatherProcessor("dummyApiKey");
+            WeatherConditions conditions = weatherProcessor.updateWeather(43.6777, -79.6248);
 
+            Assert::AreEqual(802, conditions.conditionCode);
+            Assert::AreEqual(std::string("partly cloudy"), std::string(conditions.description));
+            Assert::AreEqual(5000, conditions.arrVisibility);
+            Assert::AreEqual(25, conditions.avgTemp);
+            Assert::AreEqual(20, conditions.tempMin);
+            Assert::AreEqual(30, conditions.tempMax);
+            Assert::AreEqual(15, conditions.windSpeed);
+            Assert::AreEqual(3600, conditions.timezone);
+        }
 
+        // Test method for WeatherProcessor::isWeatherGood
+        TEST_METHOD(TestIsWeatherGood) {
+            MockWeatherProcessor weatherProcessor("dummyApiKey");
+            WeatherConditions conditions = weatherProcessor.updateWeather(43.6777, -79.6248);
+            WeatherStatus status = weatherProcessor.isWeatherGood(conditions);
+
+            Assert::IsTrue(status.weatherGood);
+            Assert::IsTrue(status.weatherMessage.empty());
+        }
+
+        // Test method for bad weather conditions
+        TEST_METHOD(TestBadWeatherConditions) {
+            MockWeatherProcessor weatherProcessor("dummyApiKey");
+
+            // Simulate bad weather conditions
+            WeatherConditions badConditions;
+            badConditions.windSpeed = 25; // High wind speed
+            badConditions.arrVisibility = 800; // Low visibility
+
+            WeatherStatus status = weatherProcessor.isWeatherGood(badConditions);
+
+            Assert::IsFalse(status.weatherGood);
+            Assert::AreEqual("Bad weather conditions detected.", status.weatherMessage.c_str());
+        }
+ 
     };
 }

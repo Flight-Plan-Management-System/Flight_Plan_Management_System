@@ -15,7 +15,7 @@
 #include <atomic>
 #include <map>
 
-//#include <nlohmann/json.hpp>
+#include <nlohmann/json.hpp>
 
 #define CURL_STATICLIB
 #include "curl/curl.h"
