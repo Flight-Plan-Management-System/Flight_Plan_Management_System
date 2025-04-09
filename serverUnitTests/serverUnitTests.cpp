@@ -6,6 +6,7 @@
 #include <sstream>
 #include <vector>
 #include <set>
+#include <unordered_map>
 
 #include <map>
 
@@ -214,6 +215,30 @@ FlightPlan createTestFlightPlan(const char* flightId, const char* depAirport, co
     return plan;
 }
 
+FlightLog createTestFlightLog(const char* flightId, const char* totalFlightTime, int fuelOnBoard, int estimatedFuelBurn) {
+    FlightLog log;
+    SafeString::copy(log.flightId, sizeof(log.flightId), flightId);
+    SafeString::copy(log.totalFlightTime, sizeof(log.totalFlightTime), totalFlightTime);
+    log.fuelOnBoard = fuelOnBoard;
+    log.estimatedFuelBurn = estimatedFuelBurn;
+    log.totalWeight = 0; // Default value
+    SafeString::copy(log.picName, sizeof(log.picName), "Test PIC");
+    SafeString::copy(log.remarks, sizeof(log.remarks), "Test remarks");
+
+    // Initialize weatherInfo with default values
+    log.weatherInfo = {};
+    log.weatherInfo.conditionCode = 800; 
+    SafeString::copy(log.weatherInfo.description, sizeof(log.weatherInfo.description), "clear sky");
+    log.weatherInfo.arrVisibility = 10000; 
+    log.weatherInfo.avgTemp = 20.0; 
+    log.weatherInfo.tempMin = 15.0; 
+    log.weatherInfo.tempMax = 25.0; 
+    log.weatherInfo.windSpeed = 5; 
+    log.weatherInfo.timezone = 0; 
+
+    return log;
+}
+
 Notam createTestNotam(const char* id, const char* location, const char* affectedAirspaceId) {
     Notam notam;
     SafeString::copy(notam.identifier, sizeof(notam.identifier), id);
@@ -284,8 +309,7 @@ public:
     }
 };
 
-
-// Add the mock class for WeatherProcessor
+// Mock class for WeatherProcessor
 class MockWeatherProcessor {
 public:
     MockWeatherProcessor(const std::string& apiKey) {}
@@ -335,6 +359,44 @@ public:
         }
         return status;
     }
+};
+
+// Mock class for WeatherProcessor
+// Mock class for FuelChecker
+class MockFuelChecker {
+public:
+    MockFuelChecker() {}
+
+    bool meetsReserveFuelRequirement(const FlightLog& log) {
+        int remainingFuel = log.fuelOnBoard - log.estimatedFuelBurn;
+        return remainingFuel >= MINIMUM_RESERVE_FUEL;
+    }
+
+    bool isUnusualFuelBurn(const FlightLog& log, const std::string& aircraftType) {
+        if (fuelBurnRates.find(aircraftType) == fuelBurnRates.end()) {
+            return false;
+        }
+
+        int expectedBurnRate = fuelBurnRates[aircraftType]; // Liters per minute
+        int flightDuration = convertFlightTimeToMinutes(log.totalFlightTime);
+        int expectedFuelBurn = flightDuration * expectedBurnRate;
+
+        return log.estimatedFuelBurn < expectedFuelBurn * 0.8 || log.estimatedFuelBurn > expectedFuelBurn * 1.2;
+    }
+
+private:
+    std::unordered_map<std::string, int> fuelBurnRates = {
+        {"Boeing737", 50},
+        {"AirbusA320", 45}
+    };
+
+    int convertFlightTimeToMinutes(const std::string& flightTime) {
+        int hours = std::stoi(flightTime.substr(0, 2));
+        int minutes = std::stoi(flightTime.substr(3, 2));
+        return hours * 60 + minutes;
+    }
+
+    static const int MINIMUM_RESERVE_FUEL = 1500; // Example value
 };
 
 namespace ServerUnitTests
@@ -611,6 +673,66 @@ namespace ServerUnitTests
             Assert::IsFalse(status.weatherGood);
             Assert::AreEqual("Bad weather conditions detected.", status.weatherMessage.c_str());
         }
- 
+
+        // Test method for FuelChecker::meetsReserveFuelRequirement (meets requirement)
+        TEST_METHOD(TestMeetsReserveFuelRequirement_MeetsRequirement) {
+            MockFuelChecker fuelChecker;
+
+            FlightLog log = createTestFlightLog("FL123", "02:00", 5000, 3000);
+            bool result = fuelChecker.meetsReserveFuelRequirement(log);
+
+            Assert::IsTrue(result);
+        }
+
+        // Test method for FuelChecker::meetsReserveFuelRequirement (does not meet requirement)
+        TEST_METHOD(TestMeetsReserveFuelRequirement_DoesNotMeetRequirement) {
+            MockFuelChecker fuelChecker;
+
+            FlightLog log = createTestFlightLog("FL123", "02:00", 4000, 3000);
+            bool result = fuelChecker.meetsReserveFuelRequirement(log);
+
+            Assert::IsFalse(result);
+        }
+
+        // Test method for FuelChecker::isUnusualFuelBurn (normal fuel burn)
+        TEST_METHOD(TestIsUnusualFuelBurn_NormalFuelBurn) {
+            MockFuelChecker fuelChecker;
+
+            FlightLog log = createTestFlightLog("FL123", "02:00", 5000, 6000);
+            bool result = fuelChecker.isUnusualFuelBurn(log, "Boeing737");
+
+            Assert::IsFalse(result);
+        }
+
+        // Test method for FuelChecker::isUnusualFuelBurn (too low fuel burn)
+        TEST_METHOD(TestIsUnusualFuelBurn_TooLowFuelBurn) {
+            MockFuelChecker fuelChecker;
+
+            FlightLog log = createTestFlightLog("FL123", "02:00", 5000, 2000);
+            bool result = fuelChecker.isUnusualFuelBurn(log, "Boeing737");
+
+            Assert::IsTrue(result);
+        }
+
+        // Test method for FuelChecker::isUnusualFuelBurn (too high fuel burn)
+        TEST_METHOD(TestIsUnusualFuelBurn_TooHighFuelBurn) {
+            MockFuelChecker fuelChecker;
+
+            FlightLog log = createTestFlightLog("FL123", "02:00", 5000, 10000);
+            bool result = fuelChecker.isUnusualFuelBurn(log, "Boeing737");
+
+            Assert::IsTrue(result);
+        }
+
+        // Test method for FuelChecker::isUnusualFuelBurn (unknown aircraft type)
+        TEST_METHOD(TestIsUnusualFuelBurn_UnknownAircraftType) {
+            MockFuelChecker fuelChecker;
+
+            // Use createTestFlightLog to generate a FlightLog
+            FlightLog log = createTestFlightLog("FL123", "02:00", 5000, 6000);
+            bool result = fuelChecker.isUnusualFuelBurn(log, "UnknownType");
+
+            Assert::IsFalse(result);
+        }
     };
 }
