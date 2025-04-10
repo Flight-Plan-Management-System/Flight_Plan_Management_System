@@ -301,3 +301,17 @@ NOTAM CLIENT LOG SESSION: 2025-04-09 17:55:54
 [17:55:54] NotamClient initialized
 [17:55:54] Winsock initialized successfully
 [17:55:54] Generated client ID: A4160
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-04-09 22:12:49
+=================================================
+[22:12:49] NotamClient initialized
+[22:12:49] Winsock initialized successfully
+[22:12:49] Generated client ID: A4727
+
+=================================================
+NOTAM CLIENT LOG SESSION: 2025-04-09 22:15:40
+=================================================
+[22:15:40] NotamClient initialized
+[22:15:40] Winsock initialized successfully
+[22:15:40] Generated client ID: A611
